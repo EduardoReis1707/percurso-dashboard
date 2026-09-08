@@ -1,0 +1,382 @@
+<title>Esboço do banco — Percurso</title>
+<style>
+  :root {
+    --accent: #00893f;
+    --accent-soft: #e3f5ea;
+    --accent-line: #bfe3cd;
+    --bg: #fbfcfa;
+    --surface: #ffffff;
+    --surface-2: #f1f5f2;
+    --border: #dfe6e1;
+    --text: #182119;
+    --text-muted: #566259;
+    --text-faint: #8b968f;
+    --mono-bg: #101913;
+    --mono-text: #d9f0e0;
+    --key-pk: #b9770e;
+    --key-fk: #3568b0;
+    --font-display: "Baloo 2", "Poppins", system-ui, sans-serif;
+    --font-body: "Inter", system-ui, -apple-system, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --accent: #35cc7f;
+      --accent-soft: #17301f;
+      --accent-line: #2b4a37;
+      --bg: #10150f;
+      --surface: #171f16;
+      --surface-2: #1d2a1c;
+      --border: #2b3a29;
+      --text: #eaf1e8;
+      --text-muted: #a7b7a4;
+      --text-faint: #7c8f83;
+      --mono-bg: #0b120d;
+      --mono-text: #bdeccf;
+      --key-pk: #e3a53e;
+      --key-fk: #7fabf0;
+    }
+  }
+  :root[data-theme="dark"] {
+    --accent: #35cc7f;
+    --accent-soft: #17301f;
+    --accent-line: #2b4a37;
+    --bg: #10150f;
+    --surface: #171f16;
+    --surface-2: #1d2a1c;
+    --border: #2b3a29;
+    --text: #eaf1e8;
+    --text-muted: #a7b7a4;
+    --text-faint: #7c8f83;
+    --mono-bg: #0b120d;
+    --mono-text: #bdeccf;
+    --key-pk: #e3a53e;
+    --key-fk: #7fabf0;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    line-height: 1.6;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 48px 24px 90px; }
+
+  header.page { margin-bottom: 34px; }
+  .eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 10px;
+  }
+  h1 {
+    font-family: var(--font-display); font-weight: 700; font-size: 32px; margin: 0 0 12px;
+    text-wrap: balance;
+  }
+  .lede { color: var(--text-muted); font-size: 15.5px; max-width: 64ch; margin: 0; }
+
+  h2 {
+    font-family: var(--font-display); font-weight: 700; font-size: 20px;
+    margin: 46px 0 6px; padding-top: 20px; border-top: 1px solid var(--border);
+  }
+  h2:first-of-type { border-top: none; padding-top: 0; }
+  .section-note { color: var(--text-muted); font-size: 14px; margin: 0 0 18px; max-width: 68ch; }
+
+  p { max-width: 68ch; }
+  .callout {
+    background: var(--accent-soft); border: 1px solid var(--accent-line);
+    border-radius: 10px; padding: 14px 16px; font-size: 13.5px; color: var(--text);
+    margin: 16px 0 24px; max-width: 68ch;
+  }
+  .callout b { color: var(--accent); }
+
+  figure { margin: 0 0 30px; }
+  figure.diagram {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px; overflow-x: auto;
+  }
+  figcaption { font-size: 12.5px; color: var(--text-faint); margin-top: 10px; text-align: center; }
+
+  .table-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    overflow: hidden; margin-bottom: 20px;
+  }
+  .table-card-head {
+    display: flex; align-items: baseline; gap: 10px; justify-content: space-between;
+    padding: 13px 18px; background: var(--surface-2); border-bottom: 1px solid var(--border);
+  }
+  .table-card-head .tname {
+    font-family: var(--font-mono); font-weight: 600; font-size: 14.5px; color: var(--text);
+  }
+  .table-card-head .tdesc { font-size: 12.5px; color: var(--text-muted); text-align: right; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--text-faint); font-weight: 700; padding: 8px 18px; border-bottom: 1px solid var(--border);
+  }
+  tbody td { padding: 8px 18px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  td.fname { font-family: var(--font-mono); font-weight: 600; white-space: nowrap; }
+  td.ftype { font-family: var(--font-mono); color: var(--text-muted); white-space: nowrap; font-size: 12px; }
+  td.fnote { color: var(--text-muted); }
+  .key { font-family: var(--font-mono); font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px; margin-right: 6px; }
+  .key.pk { background: color-mix(in srgb, var(--key-pk) 18%, transparent); color: var(--key-pk); }
+  .key.fk { background: color-mix(in srgb, var(--key-fk) 18%, transparent); color: var(--key-fk); }
+
+  .rel-list { display: flex; flex-direction: column; gap: 8px; margin: 0 0 30px; padding: 0; list-style: none; }
+  .rel-list li {
+    font-family: var(--font-mono); font-size: 13px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px; padding: 9px 14px; display: flex; align-items: center; gap: 10px;
+  }
+  .rel-list .arrow { color: var(--accent); font-weight: 700; }
+  .rel-list .rel-desc { font-family: var(--font-body); color: var(--text-muted); font-size: 12.5px; margin-left: auto; }
+
+  pre.code {
+    background: var(--mono-bg); color: var(--mono-text); border-radius: 10px; padding: 16px 18px;
+    font-family: var(--font-mono); font-size: 12.5px; overflow-x: auto; line-height: 1.55; margin: 0 0 24px;
+  }
+
+  .next-steps { display: flex; flex-direction: column; gap: 10px; padding: 0; list-style: none; margin: 0; }
+  .next-steps li {
+    display: flex; gap: 12px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 16px; font-size: 13.5px;
+  }
+  .next-steps .n {
+    font-family: var(--font-mono); font-weight: 700; color: var(--accent); flex-shrink: 0;
+  }
+
+  @media (max-width: 640px) {
+    .table-card-head { flex-direction: column; align-items: flex-start; gap: 4px; }
+    .table-card-head .tdesc { text-align: left; }
+  }
+</style>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+
+<div class="wrap">
+  <header class="page">
+    <div class="eyebrow">Percurso Cataguases · Esboço técnico</div>
+    <h1>Estrutura do banco de dados no Supabase</h1>
+    <p class="lede">Como os dados de alunos, responsáveis, turmas, mensalidades e material didático ficariam organizados em tabelas — a base para ligar o painel a dados reais.</p>
+  </header>
+
+  <div class="callout">
+    <b>Ideia central:</b> em vez de repetir os mesmos dados em várias linhas de planilha (como o telefone do responsável repetido pra cada irmão matriculado, ou o histórico de parcelas escrito como texto livre), cada informação mora em um único lugar e as tabelas se referenciam entre si. Isso evita dado desatualizado em um lugar e certo em outro, e permite somar, filtrar e cruzar informação automaticamente — o que uma célula de texto não permite.
+  </div>
+
+  <h2>Como as tabelas se conectam</h2>
+  <p class="section-note">Um diagrama de entidade-relacionamento: cada caixa é uma tabela, cada linha uma conexão.</p>
+
+  <figure class="diagram">
+    <pre class="mermaid">
+erDiagram
+    TURMAS ||--o{ ALUNOS : "recebe"
+    RESPONSAVEIS ||--o{ ALUNOS : "responde por"
+    ALUNOS ||--o| MATRICULA_FINANCEIRO : "tem"
+    ALUNOS ||--o{ MENSALIDADES : "deve"
+    ALUNOS ||--o{ MATERIAL_DIDATICO : "compra"
+    ALUNOS ||--o{ PRESENCAS : "frequenta"
+    TURMAS ||--o{ PRESENCAS : "registra"
+
+    TURMAS {
+        uuid id PK
+        text nome
+        text tipo
+        int ano_letivo
+    }
+    RESPONSAVEIS {
+        uuid id PK
+        text nome_completo
+        text telefone
+        text cpf
+    }
+    ALUNOS {
+        uuid id PK
+        text nome_completo
+        uuid turma_id FK
+        uuid responsavel_id FK
+        text status
+    }
+    MATRICULA_FINANCEIRO {
+        uuid id PK
+        uuid aluno_id FK
+        numeric valor_total_curso
+        int qtd_parcelas
+    }
+    MENSALIDADES {
+        uuid id PK
+        uuid aluno_id FK
+        date data_vencimento
+        text status
+    }
+    MATERIAL_DIDATICO {
+        uuid id PK
+        uuid aluno_id FK
+        text tipo
+        boolean entregue
+    }
+    PRESENCAS {
+        uuid id PK
+        uuid aluno_id FK
+        date data
+        boolean presente
+    }
+    </pre>
+    <figcaption>Alunos no centro: cada aluno pertence a uma turma e a um responsável, e gera suas próprias mensalidades, itens de material e presenças.</figcaption>
+  </figure>
+
+  <h2>Tabela por tabela</h2>
+  <p class="section-note">Campos principais de cada tabela. <span class="key pk">PK</span> identifica a própria linha, <span class="key fk">FK</span> aponta pra outra tabela.</p>
+
+  <div class="table-card">
+    <div class="table-card-head"><span class="tname">turmas</span><span class="tdesc">As 4 turmas do ano letivo</span></div>
+    <table>
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Observação</th></tr></thead>
+      <tbody>
+        <tr><td class="fname"><span class="key pk">PK</span>id</td><td class="ftype">uuid</td><td class="fnote">gerado automaticamente</td></tr>
+        <tr><td class="fname">nome</td><td class="ftype">text</td><td class="fnote">"Pré-CEFET 1", "8º ano"...</td></tr>
+        <tr><td class="fname">tipo</td><td class="ftype">text</td><td class="fnote">CEFET / 8º ano / ENEM</td></tr>
+        <tr><td class="fname">ano_letivo</td><td class="ftype">int</td><td class="fnote">2026</td></tr>
+        <tr><td class="fname">horario</td><td class="ftype">text</td><td class="fnote">"Segunda a quinta"</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-card">
+    <div class="table-card-head"><span class="tname">responsaveis</span><span class="tdesc">Pai/mãe/responsável — 1 cadastro, mesmo com irmãos matriculados</span></div>
+    <table>
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Observação</th></tr></thead>
+      <tbody>
+        <tr><td class="fname"><span class="key pk">PK</span>id</td><td class="ftype">uuid</td><td class="fnote"></td></tr>
+        <tr><td class="fname">nome_completo</td><td class="ftype">text</td><td class="fnote"></td></tr>
+        <tr><td class="fname">data_nascimento</td><td class="ftype">date</td><td class="fnote"></td></tr>
+        <tr><td class="fname">profissao</td><td class="ftype">text</td><td class="fnote"></td></tr>
+        <tr><td class="fname">telefone, email</td><td class="ftype">text</td><td class="fnote"></td></tr>
+        <tr><td class="fname">rg, orgao_expedidor, data_expedicao</td><td class="ftype">text / date</td><td class="fnote"></td></tr>
+        <tr><td class="fname">cpf</td><td class="ftype">text</td><td class="fnote">único</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-card">
+    <div class="table-card-head"><span class="tname">alunos</span><span class="tdesc">O centro do sistema</span></div>
+    <table>
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Observação</th></tr></thead>
+      <tbody>
+        <tr><td class="fname"><span class="key pk">PK</span>id</td><td class="ftype">uuid</td><td class="fnote"></td></tr>
+        <tr><td class="fname">nome_completo, data_nascimento, local_nascimento</td><td class="ftype">text / date</td><td class="fnote"></td></tr>
+        <tr><td class="fname">endereco, numero, complemento, bairro, cidade, uf, cep</td><td class="ftype">text</td><td class="fnote"></td></tr>
+        <tr><td class="fname">telefone, whatsapp, email</td><td class="ftype">text</td><td class="fnote">contato direto do aluno</td></tr>
+        <tr><td class="fname">rg, orgao_expedidor, data_expedicao, cpf</td><td class="ftype">text / date</td><td class="fnote"></td></tr>
+        <tr><td class="fname">foto_url</td><td class="ftype">text</td><td class="fnote">aponta pra um arquivo no Storage</td></tr>
+        <tr><td class="fname"><span class="key fk">FK</span>turma_id</td><td class="ftype">uuid</td><td class="fnote">→ turmas.id</td></tr>
+        <tr><td class="fname"><span class="key fk">FK</span>responsavel_id</td><td class="ftype">uuid</td><td class="fnote">→ responsaveis.id</td></tr>
+        <tr><td class="fname">autorizado_sair_sozinho</td><td class="ftype">boolean</td><td class="fnote">visto na planilha do 8º ano</td></tr>
+        <tr><td class="fname">codigo_matricula</td><td class="ftype">text</td><td class="fnote">único, ex: 006</td></tr>
+        <tr><td class="fname">data_matricula</td><td class="ftype">date</td><td class="fnote"></td></tr>
+        <tr><td class="fname">status</td><td class="ftype">text</td><td class="fnote">ativo / trancado / desistente / formado</td></tr>
+        <tr><td class="fname">observacoes</td><td class="ftype">text</td><td class="fnote">campo livre, como no formulário atual</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-card">
+    <div class="table-card-head"><span class="tname">matricula_financeiro</span><span class="tdesc">Combinado feito no ato da matrícula (1 por aluno/ano)</span></div>
+    <table>
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Observação</th></tr></thead>
+      <tbody>
+        <tr><td class="fname"><span class="key pk">PK</span>id</td><td class="ftype">uuid</td><td class="fnote"></td></tr>
+        <tr><td class="fname"><span class="key fk">FK</span>aluno_id</td><td class="ftype">uuid</td><td class="fnote">→ alunos.id</td></tr>
+        <tr><td class="fname">tipo</td><td class="ftype">text</td><td class="fnote">integral / bolsa parcial / bolsa 100%</td></tr>
+        <tr><td class="fname">valor_matricula, forma_pagamento, data_pagamento</td><td class="ftype">numeric / text / date</td><td class="fnote"></td></tr>
+        <tr><td class="fname">valor_total_curso, qtd_parcelas, valor_parcela</td><td class="ftype">numeric / int / numeric</td><td class="fnote">gera as mensalidades abaixo</td></tr>
+        <tr><td class="fname">dia_vencimento</td><td class="ftype">int</td><td class="fnote">ex: todo dia 10</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-card">
+    <div class="table-card-head"><span class="tname">mensalidades</span><span class="tdesc">Uma linha por parcela — troca o texto corrido da planilha por dados que somam e filtram</span></div>
+    <table>
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Observação</th></tr></thead>
+      <tbody>
+        <tr><td class="fname"><span class="key pk">PK</span>id</td><td class="ftype">uuid</td><td class="fnote"></td></tr>
+        <tr><td class="fname"><span class="key fk">FK</span>aluno_id</td><td class="ftype">uuid</td><td class="fnote">→ alunos.id</td></tr>
+        <tr><td class="fname">numero_parcela</td><td class="ftype">int</td><td class="fnote">1, 2, 3...</td></tr>
+        <tr><td class="fname">valor</td><td class="ftype">numeric</td><td class="fnote"></td></tr>
+        <tr><td class="fname">data_vencimento, data_pagamento</td><td class="ftype">date</td><td class="fnote"></td></tr>
+        <tr><td class="fname">forma_pagamento</td><td class="ftype">text</td><td class="fnote">pix / cartão / dinheiro</td></tr>
+        <tr><td class="fname">status</td><td class="ftype">text</td><td class="fnote">pago / atrasado / pendente / isento</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-card">
+    <div class="table-card-head"><span class="tname">material_didatico</span><span class="tdesc">Apostila e uniforme — mesma estrutura, tipo diferente</span></div>
+    <table>
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Observação</th></tr></thead>
+      <tbody>
+        <tr><td class="fname"><span class="key pk">PK</span>id</td><td class="ftype">uuid</td><td class="fnote"></td></tr>
+        <tr><td class="fname"><span class="key fk">FK</span>aluno_id</td><td class="ftype">uuid</td><td class="fnote">→ alunos.id</td></tr>
+        <tr><td class="fname">tipo</td><td class="ftype">text</td><td class="fnote">apostila / uniforme</td></tr>
+        <tr><td class="fname">valor, forma_pagamento</td><td class="ftype">numeric / text</td><td class="fnote"></td></tr>
+        <tr><td class="fname">pago, data_pagamento</td><td class="ftype">boolean / date</td><td class="fnote"></td></tr>
+        <tr><td class="fname">entregue, data_entrega</td><td class="ftype">boolean / date</td><td class="fnote"></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-card">
+    <div class="table-card-head"><span class="tname">presencas</span><span class="tdesc">Uma linha por aluno, por dia de aula</span></div>
+    <table>
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Observação</th></tr></thead>
+      <tbody>
+        <tr><td class="fname"><span class="key pk">PK</span>id</td><td class="ftype">uuid</td><td class="fnote"></td></tr>
+        <tr><td class="fname"><span class="key fk">FK</span>aluno_id</td><td class="ftype">uuid</td><td class="fnote">→ alunos.id</td></tr>
+        <tr><td class="fname"><span class="key fk">FK</span>turma_id</td><td class="ftype">uuid</td><td class="fnote">→ turmas.id</td></tr>
+        <tr><td class="fname">data</td><td class="ftype">date</td><td class="fnote"></td></tr>
+        <tr><td class="fname">presente</td><td class="ftype">boolean</td><td class="fnote"></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-card">
+    <div class="table-card-head"><span class="tname">perfis</span><span class="tdesc">Você e a secretaria — ligada ao login do Supabase</span></div>
+    <table>
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Observação</th></tr></thead>
+      <tbody>
+        <tr><td class="fname"><span class="key pk">PK</span>id</td><td class="ftype">uuid</td><td class="fnote">mesmo id do login (Supabase Auth)</td></tr>
+        <tr><td class="fname">nome</td><td class="ftype">text</td><td class="fnote"></td></tr>
+        <tr><td class="fname">papel</td><td class="ftype">text</td><td class="fnote">admin / secretaria — hoje ambos com acesso completo</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Exemplo de como isso vira SQL</h2>
+  <p class="section-note">Ilustração de duas tabelas reais — é isso que roda dentro do Supabase quando alguém for montar o banco de verdade.</p>
+  <pre class="code">create table turmas (
+  id uuid primary key default gen_random_uuid(),
+  nome text not null,
+  tipo text not null,
+  ano_letivo int not null
+);
+
+create table alunos (
+  id uuid primary key default gen_random_uuid(),
+  nome_completo text not null,
+  data_nascimento date,
+  turma_id uuid references turmas(id),
+  responsavel_id uuid references responsaveis(id),
+  status text default 'ativo',
+  created_at timestamptz default now()
+);</pre>
+
+  <h2>Próximos passos, em ordem</h2>
+  <ul class="next-steps">
+    <li><span class="n">1</span> Criar o projeto no Supabase e montar essas tabelas (posso gerar o SQL completo das 8 tabelas quando você quiser seguir).</li>
+    <li><span class="n">2</span> Importar os dados que já existem na planilha "Matrículas 2026" pra dentro dessas tabelas.</li>
+    <li><span class="n">3</span> Ligar o painel que te mostrei a esses dados reais, no lugar dos dados fictícios.</li>
+    <li><span class="n">4</span> Publicar o painel com um link próprio (Vercel/Netlify) e configurar o login de vocês duas.</li>
+  </ul>
+</div>
