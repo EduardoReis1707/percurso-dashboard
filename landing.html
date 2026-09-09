@@ -1,0 +1,430 @@
+<title>Percurso Cataguases</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+  :root{
+    --accent:#00a651; --accent-strong:#00893f; --accent-deep:#00622c;
+    --accent-soft:#e3f5ea; --accent-soft-line:#c3e8d2;
+    --gold:#c98a1f; --gold-soft:#faf1de;
+    --bg:#f5f8f5; --surface:#ffffff; --surface-2:#eef3ef;
+    --border:#dde5df; --text:#17201b; --text-muted:#57645a; --text-faint:#8a978c;
+    --shadow:0 1px 2px rgba(20,30,22,.06), 0 4px 16px rgba(20,30,22,.06);
+    --shadow-lift:0 20px 46px rgba(20,40,25,.16);
+    --font-display:"Baloo 2","Poppins",system-ui,sans-serif;
+    --font-body:"Inter",system-ui,-apple-system,sans-serif;
+    --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,monospace;
+    --ease:cubic-bezier(.22,1,.36,1);
+    --on-accent-deep:#ffffff;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0e1410; --surface:#161e17; --surface-2:#1c2a1e;
+      --border:#2a3a2b; --text:#e9f2e7; --text-muted:#a4b6a2; --text-faint:#77897a;
+      --accent:#2fd57a; --accent-strong:#5fe39a; --accent-deep:#07361d;
+      --accent-soft:#1a3324; --accent-soft-line:#2c4d34;
+      --gold:#e6b45a; --gold-soft:#2c2410;
+      --shadow:0 1px 2px rgba(0,0,0,.35), 0 4px 16px rgba(0,0,0,.35);
+      --shadow-lift:0 22px 50px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0e1410; --surface:#161e17; --surface-2:#1c2a1e;
+    --border:#2a3a2b; --text:#e9f2e7; --text-muted:#a4b6a2; --text-faint:#77897a;
+    --accent:#2fd57a; --accent-strong:#5fe39a; --accent-deep:#07361d;
+    --accent-soft:#1a3324; --accent-soft-line:#2c4d34;
+    --gold:#e6b45a; --gold-soft:#2c2410;
+    --shadow:0 1px 2px rgba(0,0,0,.35), 0 4px 16px rgba(0,0,0,.35);
+    --shadow-lift:0 22px 50px rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:var(--font-body); -webkit-font-smoothing:antialiased;
+  }
+  img{display:block;}
+  h1,h2,h3{font-family:var(--font-display); margin:0; text-wrap:balance; font-weight:700;}
+  p{margin:0;}
+  a{color:inherit;}
+  .wrap{max-width:1120px; margin:0 auto; padding:0 28px;}
+  @media (max-width:640px){ .wrap{padding:0 18px;} }
+
+  .mono{font-family:var(--font-mono); font-variant-numeric:tabular-nums;}
+  .eyebrow{
+    font-size:11.5px; font-weight:700; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--accent-strong); display:flex; align-items:center; gap:8px;
+  }
+  .eyebrow::before{content:""; width:16px; height:2px; background:var(--accent-strong); border-radius:2px;}
+
+  /* ---------- shape motif (shared with the painel's login screen) ---------- */
+  .shape{position:absolute; pointer-events:none;}
+  @keyframes drift{ 0%,100%{transform:translateY(0) rotate(0deg);} 50%{transform:translateY(-14px) rotate(6deg);} }
+  .dotfield{
+    position:absolute; inset:0;
+    background-image:radial-gradient(color-mix(in srgb, var(--on-accent-deep) 45%, transparent) 1.4px, transparent 1.4px);
+    background-size:26px 26px;
+    -webkit-mask-image:radial-gradient(ellipse 65% 55% at 30% 35%, #000 0%, transparent 72%);
+            mask-image:radial-gradient(ellipse 65% 55% at 30% 35%, #000 0%, transparent 72%);
+    opacity:.35;
+  }
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:40;
+    background:color-mix(in srgb, var(--surface) 88%, transparent);
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .topbar .row{display:flex; align-items:center; justify-content:space-between; gap:18px; padding:13px 0;}
+  .brand{display:flex; align-items:center; gap:10px; text-decoration:none;}
+  .brand img{height:26px; width:auto;}
+  .portals{display:flex; gap:4px; background:var(--surface-2); border:1px solid var(--border); padding:3px; border-radius:11px;}
+  .portal-link{
+    font-family:var(--font-body); font-weight:700; font-size:12.5px; color:var(--text-muted);
+    padding:7px 13px; border-radius:8px; text-decoration:none; transition:background-color .18s var(--ease), color .18s var(--ease);
+    white-space:nowrap;
+  }
+  .portal-link:hover{background:var(--surface); color:var(--accent-strong); box-shadow:var(--shadow);}
+  @media (max-width:720px){
+    .portals{display:none;}
+  }
+
+  /* ---------- buttons ---------- */
+  .btn{
+    display:inline-flex; align-items:center; gap:8px; justify-content:center;
+    font-family:var(--font-body); font-weight:700; font-size:14px;
+    padding:12px 22px; border-radius:10px; border:1px solid transparent; cursor:pointer;
+    text-decoration:none; transition:transform .15s var(--ease), box-shadow .2s var(--ease), background-color .18s var(--ease), border-color .18s var(--ease);
+    white-space:nowrap;
+  }
+  .btn svg{width:17px; height:17px; flex-shrink:0;}
+  .btn:active{transform:scale(.97);}
+  .btn-primary{background:var(--accent-strong); color:#fff; box-shadow:0 10px 24px -8px color-mix(in srgb, var(--accent-strong) 65%, transparent);}
+  .btn-primary:hover{background:var(--accent); box-shadow:0 14px 30px -8px color-mix(in srgb, var(--accent-strong) 70%, transparent); transform:translateY(-1px);}
+  .btn-ghost-light{background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.4); color:#fff;}
+  .btn-ghost-light:hover{background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.7);}
+  .btn-outline{background:transparent; border-color:var(--border); color:var(--text);}
+  .btn-outline:hover{border-color:var(--accent-soft-line); background:var(--accent-soft); color:var(--accent-strong);}
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative; overflow:hidden;
+    background:linear-gradient(155deg, var(--accent-strong), var(--accent-deep) 75%);
+    color:#fff;
+  }
+  .hero .shapes svg{position:absolute; animation:drift 13s var(--ease) infinite;}
+  .hero .shapes svg:nth-child(2){animation-duration:17s; animation-direction:reverse;}
+  .hero .shapes svg:nth-child(3){animation-duration:10s;}
+  .hero-inner{
+    position:relative; z-index:2;
+    display:grid; grid-template-columns:1.1fr .9fr; gap:40px; align-items:center;
+    padding:76px 0 92px;
+  }
+  @media (max-width:880px){ .hero-inner{grid-template-columns:1fr; padding:52px 0 64px;} }
+  .hero h1{font-size:clamp(30px,4.4vw,48px); line-height:1.12; margin:16px 0 18px; font-weight:800; color:#fff;}
+  .hero h1 em{font-style:normal; color:var(--gold);}
+  .hero p.lead{font-size:16.5px; line-height:1.65; color:rgba(255,255,255,.9); max-width:480px;}
+  .hero .cta-row{display:flex; gap:12px; flex-wrap:wrap; margin-top:30px;}
+  .hero .eyebrow{color:rgba(255,255,255,.85);}
+  .hero .eyebrow::before{background:var(--gold);}
+
+  .hero-panel{
+    position:relative; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.22);
+    border-radius:20px; padding:26px; backdrop-filter:blur(6px);
+    display:flex; flex-direction:column; gap:14px;
+  }
+  .hero-panel .hp-row{display:flex; align-items:center; gap:12px; padding:12px 14px; background:rgba(255,255,255,.08); border-radius:12px; border:1px solid rgba(255,255,255,.14);}
+  .hero-panel .hp-icon{width:36px; height:36px; border-radius:9px; background:rgba(255,255,255,.14); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .hero-panel .hp-icon svg{width:18px; height:18px; color:var(--gold);}
+  .hero-panel .hp-text b{display:block; font-family:var(--font-display); font-size:14px; font-weight:700;}
+  .hero-panel .hp-text span{font-size:12px; color:rgba(255,255,255,.75);}
+
+  /* ---------- sections ---------- */
+  section{padding:74px 0;}
+  .section-head{max-width:600px; margin-bottom:40px;}
+  .section-head h2{font-size:clamp(24px,3vw,32px); margin-top:12px;}
+  .section-head p{color:var(--text-muted); font-size:15px; margin-top:10px; line-height:1.6;}
+
+  /* ---------- turmas ---------- */
+  .turmas-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:16px;}
+  @media (max-width:920px){ .turmas-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:560px){ .turmas-grid{grid-template-columns:1fr;} }
+  .turma-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    padding:22px 20px; display:flex; flex-direction:column; gap:12px;
+    box-shadow:var(--shadow); transition:transform .22s var(--ease), box-shadow .22s var(--ease), border-color .22s var(--ease);
+  }
+  .turma-card:hover{transform:translateY(-4px); box-shadow:var(--shadow-lift); border-color:var(--accent-soft-line);}
+  .turma-tag{
+    align-self:flex-start; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+    padding:4px 9px; border-radius:999px; background:var(--accent-soft); color:var(--accent-strong);
+  }
+  .turma-card.gold .turma-tag{background:var(--gold-soft); color:var(--gold);}
+  .turma-card h3{font-size:18px;}
+  .turma-card p{font-size:13.5px; color:var(--text-muted); line-height:1.55;}
+  .turma-sched{
+    margin-top:auto; display:flex; align-items:center; gap:7px; font-size:12px; color:var(--text-faint);
+    padding-top:12px; border-top:1px dashed var(--border); font-weight:600;
+  }
+  .turma-sched svg{width:14px; height:14px; flex-shrink:0;}
+
+  /* ---------- aprovações (inverted band) ---------- */
+  .band{
+    background:linear-gradient(155deg, var(--accent-deep), #041b0d 85%);
+    color:#fff; position:relative; overflow:hidden;
+  }
+  .band .dotfield{opacity:.18;}
+  .band-inner{position:relative; z-index:2;}
+  .band .section-head p{color:rgba(255,255,255,.72);}
+  .band .eyebrow{color:var(--gold);}
+  .band .eyebrow::before{background:var(--gold);}
+  .band h2{color:#fff;}
+  .stat-row{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:8px;}
+  @media (max-width:720px){ .stat-row{grid-template-columns:1fr;} }
+  .stat-tile{
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:16px;
+    padding:26px 22px;
+  }
+  .stat-tile .num{font-family:var(--font-mono); font-size:40px; font-weight:600; color:var(--gold); line-height:1;}
+  .stat-tile .label{margin-top:10px; font-size:13.5px; color:rgba(255,255,255,.82); font-weight:600; line-height:1.45;}
+  .stat-note{margin-top:22px; font-size:12px; color:rgba(255,255,255,.5); font-style:italic;}
+
+  /* ---------- diferenciais ---------- */
+  .feat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+  @media (max-width:820px){ .feat-grid{grid-template-columns:1fr;} }
+  .feat{display:flex; gap:14px; padding:6px 0;}
+  .feat-icon{
+    width:44px; height:44px; border-radius:12px; background:var(--accent-soft); color:var(--accent-strong);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .feat-icon svg{width:22px; height:22px;}
+  .feat h3{font-size:15.5px; margin-bottom:5px;}
+  .feat p{font-size:13.5px; color:var(--text-muted); line-height:1.55;}
+
+  /* ---------- CTA final ---------- */
+  .cta-final{
+    background:var(--surface); border:1px solid var(--border); border-radius:22px;
+    padding:46px 40px; display:flex; align-items:center; justify-content:space-between; gap:28px;
+    box-shadow:var(--shadow); position:relative; overflow:hidden;
+  }
+  @media (max-width:760px){ .cta-final{flex-direction:column; text-align:center; padding:36px 24px;} }
+  .cta-final h2{font-size:clamp(21px,2.6vw,27px);}
+  .cta-final p{color:var(--text-muted); margin-top:8px; font-size:14px;}
+  .cta-final .cta-actions{display:flex; gap:10px; flex-shrink:0; flex-wrap:wrap; justify-content:center;}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--border); padding:40px 0 34px;}
+  .foot-row{display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap;}
+  .foot-brand{display:flex; align-items:center; gap:10px;}
+  .foot-brand img{height:22px;}
+  .foot-brand span{font-size:12.5px; color:var(--text-faint);}
+  .soc-row{display:flex; gap:10px;}
+  .soc-btn{
+    width:38px; height:38px; border-radius:10px; border:1px solid var(--border); background:var(--surface);
+    display:flex; align-items:center; justify-content:center; color:var(--text-muted); text-decoration:none;
+    transition:background-color .18s var(--ease), color .18s var(--ease), border-color .18s var(--ease);
+  }
+  .soc-btn svg{width:17px; height:17px;}
+  .soc-btn:hover{background:var(--accent-soft); color:var(--accent-strong); border-color:var(--accent-soft-line);}
+  .soc-btn.disabled{opacity:.4; cursor:default; pointer-events:none;}
+  .foot-fine{margin-top:22px; font-size:11.5px; color:var(--text-faint);}
+
+  /* ---------- floating whatsapp ---------- */
+  .float-wa{
+    position:fixed; right:22px; bottom:22px; z-index:50;
+    width:56px; height:56px; border-radius:50%; background:#25D366; color:#fff;
+    display:flex; align-items:center; justify-content:center; text-decoration:none;
+    box-shadow:0 12px 28px -6px rgba(0,0,0,.4);
+    transition:transform .18s var(--ease);
+  }
+  .float-wa:hover{transform:scale(1.08);}
+  .float-wa svg{width:28px; height:28px;}
+
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto;}
+    .hero .shapes svg{animation:none;}
+  }
+</style>
+
+<!-- ============ TOPBAR ============ -->
+<div class="topbar">
+  <div class="wrap row">
+    <a class="brand" href="#top">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAA9CAYAAAANvLRxAAAjg0lEQVR4nO2deZxU1ZX4v+fcV71Bs8kiuIy7gnELiSaaCXFLjMpiDDRiJDoRmjXEGE1+GU3ZcZzoGBekgW5wBiUiWzTQuJuomMQYoyYaF4yaaERkUWTvpd695/dHAdL0VtUL4Ex9Px8+H/q+e8899suvHrEZUD8xk6oCFbXAAtc79KAdaEBUALbCoIe0DhV0K1QmpAbYS3XpKktKtEsA7NQuBIQCSuU9dlvxg6R7fmoY9YZH8vJZzL1LxdWK6vHrRcCFqOsSjcSyf+jUqZveOZORo+F0y6f+xJgAAAAASUVORK5CYII=" alt="">
+      <img src="data:image/png;base64,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" alt="Percurso Cataguases">
+    </a>
+    <nav class="portals" aria-label="Acesso ao painel">
+      <a class="portal-link" href="index.html?role=gestor">Gestor</a>
+      <a class="portal-link" href="index.html?role=coordenacao">Coordenação</a>
+      <a class="portal-link" href="responsavel.html">Responsável</a>
+    </nav>
+  </div>
+</div>
+
+<!-- ============ HERO ============ -->
+<header class="hero" id="top">
+  <div class="dotfield" style="--on-accent-deep:#fff;"></div>
+  <div class="shapes">
+    <svg width="220" height="220" style="top:-40px; right:6%;" viewBox="0 0 220 220"><circle cx="110" cy="110" r="96" fill="none" stroke="#fff" stroke-width="1.5" opacity=".3"/></svg>
+    <svg width="150" height="150" style="bottom:8%; right:-30px;" viewBox="0 0 150 150"><rect x="14" y="14" width="110" height="110" rx="20" fill="none" stroke="#fff" stroke-width="1.5" opacity=".26" transform="rotate(14 69 69)"/></svg>
+    <svg width="90" height="90" style="top:38%; right:26%;" viewBox="0 0 90 90"><path d="M8 58 L45 12 L82 58 L45 42 Z" fill="#fff" opacity=".12"/></svg>
+  </div>
+  <div class="wrap hero-inner">
+    <div>
+      <p class="eyebrow">Cursinho · Cataguases, MG</p>
+      <h1>O <em>Percurso</em> certo até a sua aprovação no CEFET e no ENEM.</h1>
+      <p class="lead">Turmas de Pré-CEFET, Pré-ENEM e preparação para o 8º ano, com simulados, revisões e uma equipe próxima da família — presencial, em Cataguases.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://wa.me/5532934227334?text=Ol%C3%A1!%20Quero%20saber%20mais%20sobre%20as%20turmas%20do%20Percurso." target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.86 9.86 0 0 0 12.04 2Zm5.8 14.15c-.24.68-1.4 1.32-1.93 1.37-.5.05-1.02.24-3.44-.72-2.91-1.16-4.77-4.12-4.92-4.31-.14-.19-1.18-1.57-1.18-3 0-1.42.75-2.12 1.02-2.41.27-.29.58-.36.78-.36l.55.01c.18.01.42-.07.65.5.24.58.82 2 .89 2.15.07.14.12.32.02.51-.09.19-.14.31-.28.48-.14.17-.29.37-.42.5-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.18-.27.36-.22.6-.13.24.09 1.53.72 1.79.85.26.13.43.19.5.3.07.11.07.63-.17 1.32Z"/></svg>
+          Falar no WhatsApp
+        </a>
+        <a class="btn btn-ghost-light" href="#turmas">Ver as turmas de 2026</a>
+      </div>
+    </div>
+    <div class="hero-panel">
+      <div class="hp-row">
+        <div class="hp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.5 2.5 3 6 3s6-1.5 6-3v-5"/></svg></div>
+        <div class="hp-text"><b>4 turmas ativas em 2026</b><span>Pré-CEFET 1, Pré-CEFET 2, 8º ano e Pré-ENEM</span></div>
+      </div>
+      <div class="hp-row">
+        <div class="hp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+        <div class="hp-text"><b>Simulados periódicos</b><span>Preparação no ritmo da prova real</span></div>
+      </div>
+      <div class="hp-row">
+        <div class="hp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3V4Z"/></svg></div>
+        <div class="hp-text"><b>Contato direto com a família</b><span>Financeiro e frequência acompanhados de perto</span></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ TURMAS ============ -->
+<section id="turmas">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Nossas turmas</p>
+      <h2>Um percurso para cada etapa.</h2>
+      <p>Da preparação de base no 8º ano até a reta final do CEFET e do ENEM, cada turma tem seu próprio ritmo e material.</p>
+    </div>
+    <div class="turmas-grid">
+      <div class="turma-card">
+        <span class="turma-tag">CEFET</span>
+        <h3>Pré-CEFET 1</h3>
+        <p>Primeiro ano de preparação para o processo seletivo do CEFET Cataguases, com revisão de base e simulados no formato da prova.</p>
+        <div class="turma-sched"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Segunda à quinta</div>
+      </div>
+      <div class="turma-card">
+        <span class="turma-tag">CEFET</span>
+        <h3>Pré-CEFET 2</h3>
+        <p>Continuidade da preparação para o CEFET, com aprofundamento de conteúdo e simulados mais próximos da data da prova.</p>
+        <div class="turma-sched"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Segunda à quinta</div>
+      </div>
+      <div class="turma-card gold">
+        <span class="turma-tag">Base</span>
+        <h3>8º ano</h3>
+        <p>Turma de base para quem está se preparando com antecedência para ingressar no Pré-CEFET nos anos seguintes.</p>
+        <div class="turma-sched"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Segunda à quinta</div>
+      </div>
+      <div class="turma-card">
+        <span class="turma-tag">ENEM</span>
+        <h3>Pré-ENEM</h3>
+        <p>Preparação completa para o ENEM e vestibulares, com todas as áreas do conhecimento e redação em foco.</p>
+        <div class="turma-sched"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Segunda à sexta</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ APROVAÇÕES ============ -->
+<section class="band">
+  <div class="dotfield"></div>
+  <div class="wrap band-inner">
+    <div class="section-head">
+      <p class="eyebrow">Aprovações</p>
+      <h2>Resultado é o que importa no fim do percurso.</h2>
+      <p>Acompanhamos cada turma até a aprovação — no CEFET, no ENEM e nos vestibulares que os alunos escolherem prestar.</p>
+    </div>
+    <div class="stat-row">
+      <div class="stat-tile"><div class="num">40+</div><div class="label">Aprovados no CEFET e no ENEM em 2026</div></div>
+      <div class="stat-tile"><div class="num">4</div><div class="label">Turmas ativas, do 8º ano à reta final do ENEM</div></div>
+      <div class="stat-tile"><div class="num">100%</div><div class="label">Presencial, com equipe de Cataguases</div></div>
+    </div>
+    <p class="stat-note">* Números ilustrativos — atualizaremos com os dados reais de aprovação de 2026.</p>
+  </div>
+</section>
+
+<!-- ============ DIFERENCIAIS ============ -->
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Por que o Percurso</p>
+      <h2>Do jeito que a preparação para uma prova de verdade precisa ser.</h2>
+    </div>
+    <div class="feat-grid">
+      <div class="feat">
+        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z"/><path d="M14 2v6h6"/></svg></div>
+        <div><h3>Material próprio</h3><p>Apostilas organizadas por turma e por etapa, alinhadas ao que cada prova cobra.</p></div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></div>
+        <div><h3>Simulados no formato real</h3><p>Provas periódicas que reproduzem o tempo e o estilo do CEFET e do ENEM.</p></div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div><h3>Turmas pequenas</h3><p>Acompanhamento próximo de cada aluno e comunicação direta com a família.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA FINAL ============ -->
+<section>
+  <div class="wrap">
+    <div class="cta-final">
+      <div>
+        <h2>Vem fazer parte da próxima turma.</h2>
+        <p>Fale com a gente pelo WhatsApp ou acompanhe o dia a dia das turmas no Instagram.</p>
+      </div>
+      <div class="cta-actions">
+        <a class="btn btn-primary" href="https://wa.me/5532934227334?text=Ol%C3%A1!%20Quero%20saber%20mais%20sobre%20as%20turmas%20do%20Percurso." target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.86 9.86 0 0 0 12.04 2Zm5.8 14.15c-.24.68-1.4 1.32-1.93 1.37-.5.05-1.02.24-3.44-.72-2.91-1.16-4.77-4.12-4.92-4.31-.14-.19-1.18-1.57-1.18-3 0-1.42.75-2.12 1.02-2.41.27-.29.58-.36.78-.36l.55.01c.18.01.42-.07.65.5.24.58.82 2 .89 2.15.07.14.12.32.02.51-.09.19-.14.31-.28.48-.14.17-.29.37-.42.5-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.18-.27.36-.22.6-.13.24.09 1.53.72 1.79.85.26.13.43.19.5.3.07.11.07.63-.17 1.32Z"/></svg>
+          WhatsApp
+        </a>
+        <a class="btn btn-outline" href="https://instagram.com/percurso.cataguases" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
+          @percurso.cataguases
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-row">
+      <div class="foot-brand">
+        <img src="data:image/png;base64,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" alt="">
+        <span>Percurso · Cataguases, MG</span>
+      </div>
+      <div class="soc-row">
+        <a class="soc-btn" href="https://wa.me/5532934227334" target="_blank" rel="noopener" aria-label="WhatsApp">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.86 9.86 0 0 0 12.04 2Zm5.8 14.15c-.24.68-1.4 1.32-1.93 1.37-.5.05-1.02.24-3.44-.72-2.91-1.16-4.77-4.12-4.92-4.31-.14-.19-1.18-1.57-1.18-3 0-1.42.75-2.12 1.02-2.41.27-.29.58-.36.78-.36l.55.01c.18.01.42-.07.65.5.24.58.82 2 .89 2.15.07.14.12.32.02.51-.09.19-.14.31-.28.48-.14.17-.29.37-.42.5-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.18-.27.36-.22.6-.13.24.09 1.53.72 1.79.85.26.13.43.19.5.3.07.11.07.63-.17 1.32Z"/></svg>
+        </a>
+        <a class="soc-btn" href="https://instagram.com/percurso.cataguases" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
+        </a>
+        <span class="soc-btn disabled" aria-label="Facebook em breve" title="Facebook em breve">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12Z"/></svg>
+        </span>
+      </div>
+    </div>
+    <p class="foot-fine">Painel interno: acesso restrito à equipe do Percurso e aos responsáveis cadastrados.</p>
+  </div>
+</footer>
+
+<a class="float-wa" href="https://wa.me/5532934227334?text=Ol%C3%A1!%20Quero%20saber%20mais%20sobre%20as%20turmas%20do%20Percurso." target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.86 9.86 0 0 0 12.04 2Zm5.8 14.15c-.24.68-1.4 1.32-1.93 1.37-.5.05-1.02.24-3.44-.72-2.91-1.16-4.77-4.12-4.92-4.31-.14-.19-1.18-1.57-1.18-3 0-1.42.75-2.12 1.02-2.41.27-.29.58-.36.78-.36l.55.01c.18.01.42-.07.65.5.24.58.82 2 .89 2.15.07.14.12.32.02.51-.09.19-.14.31-.28.48-.14.17-.29.37-.42.5-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.18-.27.36-.22.6-.13.24.09 1.53.72 1.79.85.26.13.43.19.5.3.07.11.07.63-.17 1.32Z"/></svg>
+</a>
