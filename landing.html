@@ -1,6 +1,6 @@
 <title>Percurso Cataguases</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Caveat:wght@600;700&display=swap">
 <style>
   :root{
     --accent:#00a651; --accent-strong:#00893f; --accent-deep:#00622c;
@@ -151,11 +151,14 @@
   @media (max-width:920px){ .turmas-grid{grid-template-columns:repeat(2,1fr);} }
   @media (max-width:560px){ .turmas-grid{grid-template-columns:1fr;} }
   .turma-card{
+    appearance:none; -webkit-appearance:none; color:inherit;
     background:var(--surface); border:1px solid var(--border); border-radius:16px;
-    padding:22px 20px; display:flex; flex-direction:column; gap:12px;
+    padding:22px 20px; display:flex; flex-direction:column; gap:12px; cursor:pointer;
     box-shadow:var(--shadow); transition:transform .22s var(--ease), box-shadow .22s var(--ease), border-color .22s var(--ease);
+    text-align:left; width:100%; font-family:inherit; font-size:inherit;
   }
   .turma-card:hover{transform:translateY(-4px); box-shadow:var(--shadow-lift); border-color:var(--accent-soft-line);}
+  .turma-card:active{transform:translateY(-1px) scale(.99);}
   .turma-tag{
     align-self:flex-start; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
     padding:4px 9px; border-radius:999px; background:var(--accent-soft); color:var(--accent-strong);
@@ -168,6 +171,13 @@
     padding-top:12px; border-top:1px dashed var(--border); font-weight:600;
   }
   .turma-sched svg{width:14px; height:14px; flex-shrink:0;}
+  .turma-more{
+    display:flex; align-items:center; gap:6px; font-size:12px; font-weight:700;
+    color:var(--accent-strong); margin-top:2px;
+  }
+  .turma-card.gold .turma-more{color:var(--gold);}
+  .turma-more svg{width:13px; height:13px; flex-shrink:0; transition:transform .18s var(--ease);}
+  .turma-card:hover .turma-more svg{transform:translateX(3px);}
 
   /* ---------- aprovações (inverted band) ---------- */
   .band{
@@ -189,6 +199,107 @@
   .stat-tile .num{font-family:var(--font-mono); font-size:40px; font-weight:600; color:var(--gold); line-height:1;}
   .stat-tile .label{margin-top:10px; font-size:13.5px; color:rgba(255,255,255,.82); font-weight:600; line-height:1.45;}
   .stat-note{margin-top:22px; font-size:12px; color:rgba(255,255,255,.5); font-style:italic;}
+
+  /* ---------- aprovações: carrossel ---------- */
+  .approv-ticker{
+    margin-top:34px; overflow:hidden; position:relative;
+    -webkit-mask-image:linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+            mask-image:linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+  .approv-track{display:flex; gap:22px; width:max-content; animation:approv-scroll 130s linear infinite;}
+  .approv-ticker:hover .approv-track{animation-play-state:paused;}
+  @keyframes approv-scroll{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
+  .approv-card{
+    position:relative; overflow:hidden; isolation:isolate;
+    display:flex; flex-direction:column; align-items:center; text-align:center; gap:7px;
+    width:250px; flex-shrink:0; padding:20px 16px 22px;
+    background:linear-gradient(160deg, #17c76b, var(--accent-strong) 55%, #043a1c 135%);
+    border-radius:26px; border:1px solid rgba(255,255,255,.3);
+    box-shadow:0 20px 44px -14px rgba(0,0,0,.65);
+  }
+  .approv-card::before{
+    content:""; position:absolute; z-index:-1; inset:-60% -20% auto -20%; height:140%;
+    background:radial-gradient(closest-side, rgba(255,255,255,.22), transparent 72%);
+    transform:rotate(8deg);
+  }
+  .ac-seal{
+    position:absolute; width:32px; height:32px; border-radius:50%;
+    background:radial-gradient(circle at 32% 26%, #a4f5c0, #1fae55 72%);
+    border:2px solid rgba(255,255,255,.75); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 6px 14px -4px rgba(0,0,0,.55);
+  }
+  .ac-seal svg{width:15px; height:15px;}
+  .ac-seal-tl{top:10px; left:10px; transform:rotate(-14deg);}
+  .ac-seal-br{bottom:12px; right:12px; transform:rotate(12deg);}
+  .ac-head{display:flex; flex-direction:column; align-items:center; line-height:1;}
+  .ac-approved{
+    font-family:var(--font-display); font-weight:800; font-size:19px; color:#fff;
+    letter-spacing:.02em; text-shadow:0 2px 8px rgba(0,0,0,.3);
+  }
+  .ac-approved-script{
+    font-family:"Caveat",cursive; font-weight:700; font-size:18px; color:rgba(255,255,255,.8);
+    margin-top:-3px;
+  }
+  .approv-card .ac-photowrap{position:relative; width:152px; height:216px; margin:4px 0 2px;}
+  .approv-card .ac-photo{
+    width:152px; height:216px; border-radius:18px; object-fit:cover;
+    border:3px solid #fff; box-shadow:0 10px 22px -8px rgba(0,0,0,.6);
+  }
+  .approv-card .ac-badge{
+    width:152px; height:216px; border-radius:18px; background:rgba(255,255,255,.2);
+    color:#fff; display:flex; align-items:center; justify-content:center; font-size:52px;
+    border:3px solid #fff;
+  }
+  .approv-card .ac-check{
+    position:absolute; bottom:-6px; right:-6px; width:28px; height:28px; border-radius:50%;
+    background:#ffd23a; border:3px solid #fff;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .approv-card .ac-check svg{width:14px; height:14px; color:#1a5c33;}
+  .ac-name{
+    background:#fff; color:var(--accent-deep); font-family:var(--font-display); font-weight:800;
+    font-size:13.5px; padding:7px 14px; border-radius:999px; line-height:1.2; margin-top:2px;
+  }
+  .approv-card .ac-course{
+    background:rgba(255,255,255,.94); color:var(--accent-deep); font-weight:700;
+    font-size:11px; padding:6px 12px; border-radius:11px; line-height:1.35;
+  }
+  .approv-card .ac-inst{
+    margin-top:5px; font-family:var(--font-display); font-weight:800; font-size:17px; color:#fff;
+    letter-spacing:.02em; text-shadow:0 2px 8px rgba(0,0,0,.3);
+  }
+  .approv-note{margin-top:18px; font-size:12px; color:rgba(255,255,255,.5); font-style:italic;}
+
+  /* ---------- modal: equipe de professores ---------- */
+  .modal-backdrop{
+    position:fixed; inset:0; background:rgba(8,12,8,.55); z-index:70;
+    display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-backdrop.open{display:flex;}
+  .modal-card{
+    background:var(--surface); border-radius:18px; padding:28px; max-width:420px; width:100%;
+    box-shadow:var(--shadow-lift); position:relative; max-height:82vh; overflow-y:auto;
+  }
+  .modal-card .turma-tag{margin-bottom:10px;}
+  .modal-card h3{font-size:19px;}
+  .modal-card .modal-sub{margin-top:4px; font-size:13px; color:var(--text-muted); margin-bottom:18px;}
+  .modal-close{
+    position:absolute; top:16px; right:16px; width:32px; height:32px; border-radius:9px;
+    border:1px solid var(--border); background:var(--surface-2); color:var(--text-muted);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .modal-close svg{width:16px; height:16px;}
+  .modal-close:hover{background:var(--accent-soft); color:var(--accent-strong); border-color:var(--accent-soft-line);}
+  .prof-list{display:flex; flex-direction:column; gap:10px;}
+  .prof-row{display:flex; align-items:center; gap:12px; padding:10px 12px; background:var(--surface-2); border-radius:12px;}
+  .prof-avatar{
+    width:38px; height:38px; border-radius:50%; flex-shrink:0;
+    background:linear-gradient(135deg, var(--accent), var(--accent-strong)); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; font-size:14px;
+  }
+  .prof-info b{display:block; font-size:13.5px;}
+  .prof-info span{font-size:12px; color:var(--text-muted);}
 
   /* ---------- diferenciais ---------- */
   .feat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
@@ -244,6 +355,7 @@
   @media (prefers-reduced-motion:reduce){
     html{scroll-behavior:auto;}
     .hero .shapes svg{animation:none;}
+    .approv-track{animation:none;}
   }
 </style>
 
@@ -309,30 +421,34 @@
       <p>Da preparação de base no 8º ano até a reta final do CEFET e do ENEM, cada turma tem seu próprio ritmo e material.</p>
     </div>
     <div class="turmas-grid">
-      <div class="turma-card">
+      <button type="button" class="turma-card" onclick="openProfModal('pre-cefet-1')">
         <span class="turma-tag">CEFET</span>
         <h3>Pré-CEFET 1</h3>
         <p>Primeiro ano de preparação para o processo seletivo do CEFET Cataguases, com revisão de base e simulados no formato da prova.</p>
         <div class="turma-sched"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Segunda à quinta</div>
-      </div>
-      <div class="turma-card">
+        <div class="turma-more">Ver equipe de professores <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      </button>
+      <button type="button" class="turma-card" onclick="openProfModal('pre-cefet-2')">
         <span class="turma-tag">CEFET</span>
         <h3>Pré-CEFET 2</h3>
         <p>Continuidade da preparação para o CEFET, com aprofundamento de conteúdo e simulados mais próximos da data da prova.</p>
         <div class="turma-sched"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Segunda à quinta</div>
-      </div>
-      <div class="turma-card gold">
+        <div class="turma-more">Ver equipe de professores <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      </button>
+      <button type="button" class="turma-card gold" onclick="openProfModal('oitavo-ano')">
         <span class="turma-tag">Base</span>
         <h3>8º ano</h3>
         <p>Turma de base para quem está se preparando com antecedência para ingressar no Pré-CEFET nos anos seguintes.</p>
-        <div class="turma-sched"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Segunda à quinta</div>
-      </div>
-      <div class="turma-card">
+        <div class="turma-sched"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Terça e quinta</div>
+        <div class="turma-more">Ver equipe de professores <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      </button>
+      <button type="button" class="turma-card" onclick="openProfModal('pre-enem')">
         <span class="turma-tag">ENEM</span>
         <h3>Pré-ENEM</h3>
         <p>Preparação completa para o ENEM e vestibulares, com todas as áreas do conhecimento e redação em foco.</p>
         <div class="turma-sched"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Segunda à sexta</div>
-      </div>
+        <div class="turma-more">Ver equipe de professores <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      </button>
     </div>
   </div>
 </section>
@@ -351,7 +467,11 @@
       <div class="stat-tile"><div class="num">4</div><div class="label">Turmas ativas, do 8º ano à reta final do ENEM</div></div>
       <div class="stat-tile"><div class="num">100%</div><div class="label">Presencial, com equipe de Cataguases</div></div>
     </div>
-    <p class="stat-note">* Números ilustrativos — atualizaremos com os dados reais de aprovação de 2026.</p>
+
+    <div class="approv-ticker">
+      <div class="approv-track" id="approv-track"></div>
+    </div>
+    <p class="approv-note" id="approv-note"></p>
   </div>
 </section>
 
@@ -401,6 +521,19 @@
   </div>
 </section>
 
+<!-- ============ MODAL: EQUIPE DA TURMA ============ -->
+<div class="modal-backdrop" id="prof-modal-backdrop">
+  <div class="modal-card">
+    <button type="button" class="modal-close" id="prof-modal-close" aria-label="Fechar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <span class="turma-tag" id="prof-modal-tag"></span>
+    <h3 id="prof-modal-title"></h3>
+    <p class="modal-sub" id="prof-modal-sub">Equipe de professores</p>
+    <div class="prof-list" id="prof-modal-list"></div>
+  </div>
+</div>
+
 <!-- ============ FOOTER ============ -->
 <footer>
   <div class="wrap">
@@ -428,3 +561,149 @@
 <a class="float-wa" href="https://wa.me/5532934227334?text=Ol%C3%A1!%20Quero%20saber%20mais%20sobre%20as%20turmas%20do%20Percurso." target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.86 9.86 0 0 0 12.04 2Zm5.8 14.15c-.24.68-1.4 1.32-1.93 1.37-.5.05-1.02.24-3.44-.72-2.91-1.16-4.77-4.12-4.92-4.31-.14-.19-1.18-1.57-1.18-3 0-1.42.75-2.12 1.02-2.41.27-.29.58-.36.78-.36l.55.01c.18.01.42-.07.65.5.24.58.82 2 .89 2.15.07.14.12.32.02.51-.09.19-.14.31-.28.48-.14.17-.29.37-.42.5-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.18-.27.36-.22.6-.13.24.09 1.53.72 1.79.85.26.13.43.19.5.3.07.11.07.63-.17 1.32Z"/></svg>
 </a>
+
+<script>
+  // Aprovações reais — vá acrescentando conforme forem chegando (nome, curso, instituição).
+  const APROVACOES = [
+    { nome: 'Ícaro França Rezende', curso: 'Engenharia de Controle e Automação', instituicao: 'CEFET/MG', foto: 'fotos-aprovacoes/icaro-crop.jpg' },
+    { nome: 'Isabeli Pires Gouvea', curso: 'Química', instituicao: 'IF-Rio Pomba', foto: 'fotos-aprovacoes/isabeli-pires-gouvea.jpg' },
+    { nome: 'Alice Fernanda Alves da Silva', curso: 'Desenvolvimento de Sistemas', instituicao: 'IF-Cataguases', foto: 'fotos-aprovacoes/alice-fernanda-alves-da-silva.jpg' },
+    { nome: 'Pedro Henrique Santos Inácio', curso: 'Administração', instituicao: 'IF-Cataguases', foto: 'fotos-aprovacoes/pedro-henrique-santos-inacio.jpg' },
+    { nome: 'Davi Ramos Gouvea Modesto de Andrade', curso: 'Desenvolvimento de Sistemas', instituicao: 'IF-Cataguases', foto: 'fotos-aprovacoes/davi-ramos-gouvea-modesto-de-andrade.jpg' },
+    { nome: 'Livia Roque Benjamin', curso: 'Química', instituicao: 'IF-Rio Pomba', foto: 'fotos-aprovacoes/livia-roque-benjamin.jpg' },
+    { nome: 'Salomão de Oliveira Dias Silva', curso: 'Química', instituicao: 'IF-Rio Pomba', foto: 'fotos-aprovacoes/salomao-de-oliveira-dias-silva.jpg' },
+    { nome: 'Shaore Gonçalves de Souza', curso: 'Zootecnia', instituicao: 'IF/MG', foto: 'fotos-aprovacoes/shaore-goncalves-de-souza.jpg' },
+    { nome: 'Gabriel Matias Carvalho', curso: 'Ciências Exatas', instituicao: 'UFJF', foto: 'fotos-aprovacoes/gabriel-matias-carvalho.jpg' },
+    { nome: 'Ana Luiza Meigre Mendonça', curso: 'Coluni 2026', instituicao: 'UFV', foto: 'fotos-aprovacoes/ana-luiza-meigre-mendonca.jpg' },
+    { nome: 'Júlia Pereira Mazon', curso: 'Zootecnia', instituicao: 'IF-Rio Pomba', foto: 'fotos-aprovacoes/julia-pereira-mazon.jpg' },
+    { nome: 'Gustavo Rangel Pereira', curso: 'Engenharia da Computação', instituicao: 'CEFET/MG', foto: 'fotos-aprovacoes/gustavo-rangel-pereira.jpg' },
+    { nome: 'Daniel Rodrigues Lopes Filho', curso: 'Engenharia Ambiental', instituicao: 'UFV', foto: 'fotos-aprovacoes/daniel-rodrigues-lopes-filho.jpg' },
+    { nome: 'José Galdino', curso: 'Psicologia', instituicao: 'UFES', foto: 'fotos-aprovacoes/jose-galdino.jpg' },
+    { nome: 'Cecília Souza Pereira', curso: 'Pedagogia', instituicao: 'UFV', foto: 'fotos-aprovacoes/cecilia-souza-pereira.jpg' },
+    { nome: 'Pedro Riguete Ananias', curso: 'Engenharia de Controle e Automação', instituicao: 'CEFET/MG', foto: 'fotos-aprovacoes/pedro-riguete-ananias.jpg' },
+    { nome: 'Gabriela Elisa Morais', curso: 'Gestão e Ciências Ambientais', instituicao: 'IF Sudeste Barbacena · UNIFESP · UERJ', foto: 'fotos-aprovacoes/gabriela-elisa-morais.jpg' },
+    { nome: 'João Pedro Barros Santos', curso: 'Alimentos — 3º lugar', instituicao: 'IF-Rio Pomba', foto: 'fotos-aprovacoes/joao-pedro-barros-santos.jpg' },
+    { nome: 'Mariana Rodrigues', curso: 'Administração', instituicao: 'IF-Cataguases', foto: 'fotos-aprovacoes/mariana-rodrigues.jpg' },
+    { nome: 'Felipe Anselmo Klein', curso: 'Agropecuária — 1º lugar', instituicao: 'IF-Rio Pomba', foto: 'fotos-aprovacoes/felipe-anselmo-klein.jpg' },
+  ];
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+
+  function renderAprovacoes() {
+    const track = document.getElementById('approv-track');
+    const note = document.getElementById('approv-note');
+    if (!track) return;
+    if (APROVACOES.length === 0) {
+      track.closest('.approv-ticker').style.display = 'none';
+      note.textContent = '';
+      return;
+    }
+    const checkSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+    const cardHtml = a => `
+      <div class="approv-card">
+        <span class="ac-seal ac-seal-tl">${checkSvg}</span>
+        <span class="ac-seal ac-seal-br">${checkSvg}</span>
+        <div class="ac-head">
+          <span class="ac-approved">APROVADO</span>
+          <span class="ac-approved-script">aprovado</span>
+        </div>
+        <div class="ac-photowrap">
+          ${a.foto
+            ? `<img class="ac-photo" src="${escapeHtml(a.foto)}" alt="${escapeHtml(a.nome)}">`
+            : `<span class="ac-badge">🎓</span>`}
+          <span class="ac-check">${checkSvg}</span>
+        </div>
+        <span class="ac-name">${escapeHtml(a.nome)}</span>
+        <span class="ac-course">${escapeHtml(a.curso)}</span>
+        ${a.instituicao ? `<span class="ac-inst">${escapeHtml(a.instituicao)}</span>` : ''}
+      </div>`;
+    if (APROVACOES.length === 1) {
+      // um único card: sem loop (duplicar mostraria o mesmo aluno duas vezes)
+      track.style.animation = 'none';
+      track.style.width = '100%';
+      track.style.justifyContent = 'center';
+      track.innerHTML = cardHtml(APROVACOES[0]);
+    } else {
+      // duplica a lista para o loop contínuo do carrossel
+      track.style.animation = '';
+      track.style.width = '';
+      track.style.justifyContent = '';
+      track.innerHTML = APROVACOES.map(cardHtml).join('') + APROVACOES.map(cardHtml).join('');
+    }
+    note.textContent = '* Aprovações reais de alunos do Percurso — lista em atualização constante.';
+  }
+  renderAprovacoes();
+
+  // Equipe de professores por turma. Preencha com os nomes reais quando disponíveis.
+  const TURMAS_PROFESSORES = {
+    'pre-cefet-1': {
+      nome: 'Pré-CEFET 1', tag: 'CEFET',
+      professores: [
+        { nome: 'A definir', materia: 'Matemática' },
+        { nome: 'A definir', materia: 'Português' },
+        { nome: 'A definir', materia: 'Ciências' },
+        { nome: 'A definir', materia: 'Redação' },
+      ],
+    },
+    'pre-cefet-2': {
+      nome: 'Pré-CEFET 2', tag: 'CEFET',
+      professores: [
+        { nome: 'A definir', materia: 'Matemática' },
+        { nome: 'A definir', materia: 'Português' },
+        { nome: 'A definir', materia: 'Ciências' },
+        { nome: 'A definir', materia: 'Redação' },
+      ],
+    },
+    'oitavo-ano': {
+      nome: '8º ano', tag: 'Base',
+      professores: [
+        { nome: 'A definir', materia: 'Matemática' },
+        { nome: 'A definir', materia: 'Português' },
+        { nome: 'A definir', materia: 'Ciências' },
+      ],
+    },
+    'pre-enem': {
+      nome: 'Pré-ENEM', tag: 'ENEM',
+      professores: [
+        { nome: 'A definir', materia: 'Matemática' },
+        { nome: 'A definir', materia: 'Português e Literatura' },
+        { nome: 'A definir', materia: 'Redação' },
+        { nome: 'A definir', materia: 'Ciências da Natureza' },
+        { nome: 'A definir', materia: 'Ciências Humanas' },
+      ],
+    },
+  };
+
+  function initialsOf(nome) {
+    const partes = nome.trim().split(/\s+/).filter(Boolean);
+    if (partes.length === 0) return '?';
+    if (partes.length === 1) return partes[0].slice(0, 2).toUpperCase();
+    return (partes[0][0] + partes[partes.length - 1][0]).toUpperCase();
+  }
+
+  function openProfModal(turmaId) {
+    const t = TURMAS_PROFESSORES[turmaId];
+    if (!t) return;
+    document.getElementById('prof-modal-tag').textContent = t.tag;
+    document.getElementById('prof-modal-title').textContent = t.nome;
+    document.getElementById('prof-modal-list').innerHTML = t.professores.map(p => `
+      <div class="prof-row">
+        <div class="prof-avatar">${initialsOf(p.nome === 'A definir' ? p.materia : p.nome)}</div>
+        <div class="prof-info"><b>${p.nome}</b><span>${p.materia}</span></div>
+      </div>
+    `).join('');
+    document.getElementById('prof-modal-backdrop').classList.add('open');
+  }
+  function closeProfModal() {
+    document.getElementById('prof-modal-backdrop').classList.remove('open');
+  }
+  document.getElementById('prof-modal-close').addEventListener('click', closeProfModal);
+  document.getElementById('prof-modal-backdrop').addEventListener('click', (e) => {
+    if (e.target.id === 'prof-modal-backdrop') closeProfModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeProfModal();
+  });
+</script>

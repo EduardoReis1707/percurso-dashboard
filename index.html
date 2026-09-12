@@ -671,6 +671,23 @@
     border: 1px solid var(--border);
   }
   .presenca-modal .drawer-close { position: absolute; top: 14px; right: 14px; }
+  .dup-modal-backdrop {
+    position: fixed; inset: 0; background: rgba(8, 12, 8, 0.6);
+    display: none; align-items: center; justify-content: center;
+    z-index: 70; padding: 20px;
+  }
+  .dup-modal-backdrop.open { display: flex; }
+  .dup-modal {
+    width: min(460px, 100%); background: var(--surface);
+    border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    border: 1px solid var(--border); padding: 24px;
+  }
+  .dup-modal h3 { font-family: var(--font-display); font-size: 17px; margin: 0 0 12px; }
+  .dup-modal-body { font-size: 13.5px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; }
+  .dup-modal-body b { color: var(--text); }
+  .dup-modal-body ul { margin: 8px 0 0; padding-left: 18px; }
+  .dup-modal-body li { margin-bottom: 4px; }
+  .dup-modal-actions { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
   .presenca-modal-head {
     display: flex; align-items: center; gap: 14px;
     padding: 22px 60px 18px 24px; border-bottom: 1px solid var(--border);
@@ -2184,6 +2201,18 @@
     </button>
     <img id="photo-lightbox-img" src="" alt="Foto ampliada do aluno">
     <div class="photo-lightbox-name" id="photo-lightbox-name"></div>
+  </div>
+</div>
+
+<div class="dup-modal-backdrop" id="dup-modal-backdrop">
+  <div class="dup-modal">
+    <h3>CPF/RG já cadastrado</h3>
+    <div class="dup-modal-body" id="dup-modal-body"></div>
+    <div class="dup-modal-actions">
+      <button type="button" class="btn btn-ghost" id="dup-modal-cancel">Cancelar</button>
+      <button type="button" class="btn btn-danger" id="dup-modal-delete" hidden>Apagar a outra matrícula</button>
+      <button type="button" class="btn btn-primary" id="dup-modal-proceed">Cadastrar nova matrícula</button>
+    </div>
   </div>
 </div>
 
@@ -3993,6 +4022,109 @@ document.querySelectorAll("[data-fotos-tab]").forEach(btn => {
   });
 });
 
+/* ===================== nova matrícula: checagem de CPF/RG duplicado ===================== */
+async function acharAlunoPorCampo(campo, valor, excluirId){
+  if (!valor) return null;
+  let q = supabase.from("alunos").select("id,nome_completo").eq(campo, valor).limit(1);
+  if (excluirId) q = q.neq("id", excluirId);
+  const { data, error } = await q.maybeSingle();
+  if (error) { console.error(error); return null; }
+  return data;
+}
+async function acharResponsavelPorCampo(campo, valor, excluirId){
+  if (!valor) return null;
+  let q = supabase.from("responsaveis").select("id,nome_completo").eq(campo, valor).limit(1);
+  if (excluirId) q = q.neq("id", excluirId);
+  const { data, error } = await q.maybeSingle();
+  if (error) { console.error(error); return null; }
+  return data;
+}
+
+async function checkMatriculaDuplicada({ alunoCpf, alunoRg, respCpf, respRg, excluirAlunoId, excluirResponsavelId }){
+  const conflitos = [];
+
+  const alunoPorCpf = await acharAlunoPorCampo("cpf", alunoCpf, excluirAlunoId);
+  if (alunoPorCpf) conflitos.push({ tipo: "aluno", campo: "CPF do aluno", outroNome: alunoPorCpf.nome_completo, outroAlunoId: alunoPorCpf.id });
+
+  const alunoPorRg = await acharAlunoPorCampo("rg", alunoRg, excluirAlunoId);
+  if (alunoPorRg && !conflitos.some(c => c.outroAlunoId === alunoPorRg.id)) {
+    conflitos.push({ tipo: "aluno", campo: "RG do aluno", outroNome: alunoPorRg.nome_completo, outroAlunoId: alunoPorRg.id });
+  }
+
+  const respPorCpf = await acharResponsavelPorCampo("cpf", respCpf, excluirResponsavelId);
+  if (respPorCpf) conflitos.push({ tipo: "responsavel", campo: "CPF do responsável", outroNome: respPorCpf.nome_completo, outroResponsavelId: respPorCpf.id });
+
+  const respPorRg = await acharResponsavelPorCampo("rg", respRg, excluirResponsavelId);
+  if (respPorRg && !conflitos.some(c => c.outroResponsavelId === respPorRg.id)) {
+    conflitos.push({ tipo: "responsavel", campo: "RG do responsável", outroNome: respPorRg.nome_completo, outroResponsavelId: respPorRg.id });
+  }
+
+  for (const c of conflitos) {
+    if (c.tipo === "responsavel") {
+      const { data } = await supabase.from("alunos").select("id,nome_completo").eq("responsavel_id", c.outroResponsavelId);
+      c.alunosVinculados = data || [];
+    }
+  }
+  return conflitos;
+}
+
+function showDupMatriculaModal(conflitos, onProceed){
+  const itens = conflitos.map(c => {
+    if (c.tipo === "aluno") {
+      return `<li><b>${esc(c.campo)}</b> já usado no cadastro de <b>${esc(c.outroNome)}</b>.</li>`;
+    }
+    const filhos = (c.alunosVinculados || []).map(a => esc(a.nome_completo)).join(", ") || "nenhum aluno vinculado ainda";
+    return `<li><b>${esc(c.campo)}</b> já cadastrado para <b>${esc(c.outroNome)}</b> (responsável de: ${filhos}).</li>`;
+  }).join("");
+  document.getElementById("dup-modal-body").innerHTML = `
+    Encontramos cadastro(s) já existentes com esses dados:
+    <ul>${itens}</ul>
+    Você pode apagar o cadastro de aluno relacionado e recomeçar, ou seguir e cadastrar esta como uma nova matrícula (por exemplo, um irmão usando o mesmo responsável).`;
+
+  const alunosParaApagar = new Map();
+  conflitos.forEach(c => {
+    if (c.tipo === "aluno") alunosParaApagar.set(c.outroAlunoId, c.outroNome);
+    else if ((c.alunosVinculados || []).length === 1) {
+      alunosParaApagar.set(c.alunosVinculados[0].id, c.alunosVinculados[0].nome_completo);
+    }
+  });
+
+  const backdrop = document.getElementById("dup-modal-backdrop");
+  const deleteBtn = document.getElementById("dup-modal-delete");
+  const proceedBtn = document.getElementById("dup-modal-proceed");
+  const cancelBtn = document.getElementById("dup-modal-cancel");
+  const closeModal = () => backdrop.classList.remove("open");
+
+  deleteBtn.hidden = alunosParaApagar.size === 0;
+  deleteBtn.disabled = false;
+  deleteBtn.textContent = "Apagar a outra matrícula";
+  deleteBtn.onclick = async () => {
+    const nomes = [...alunosParaApagar.values()];
+    const lista = nomes.map(n => `"${n}"`).join(" e ");
+    if (!confirm(`Isso vai apagar definitivamente ${nomes.length > 1 ? "os alunos" : "o aluno"} ${lista} — matrícula, financeiro, presenças e simulados. Essa ação não pode ser desfeita. Confirma?`)) return;
+    deleteBtn.disabled = true; deleteBtn.textContent = "Apagando...";
+    try {
+      for (const alunoId of alunosParaApagar.keys()) {
+        const { error: finErr } = await supabase.from("matricula_financeiro").delete().eq("aluno_id", alunoId);
+        if (finErr) throw finErr;
+        const { error: alunoErr } = await supabase.from("alunos").delete().eq("id", alunoId);
+        if (alunoErr) throw alunoErr;
+      }
+      closeModal();
+      await onProceed();
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao apagar a outra matrícula: " + (err.message || err));
+      deleteBtn.disabled = false; deleteBtn.textContent = "Apagar a outra matrícula";
+    }
+  };
+  proceedBtn.onclick = () => { closeModal(); onProceed(); };
+  cancelBtn.onclick = closeModal;
+  backdrop.onclick = (e) => { if (e.target === backdrop) closeModal(); };
+
+  backdrop.classList.add("open");
+}
+
 /* ===================== nova matrícula (grava no Supabase) ===================== */
 document.getElementById("save-form-btn").addEventListener("click", async () => {
   const nome = document.getElementById("f-aluno-nome").value.trim();
@@ -4015,7 +4147,34 @@ document.getElementById("save-form-btn").addEventListener("click", async () => {
     document.getElementById("f-resp-cpf").focus();
     return;
   }
+  const respNomeVal = document.getElementById("f-resp-nome").value.trim();
+  if (respNomeVal && !respCpfVal) {
+    const semCpfOk = confirm(
+      "O responsável está sendo cadastrado sem CPF.\n\n" +
+      "A senha inicial da Área do Responsável é gerada a partir dos 6 primeiros dígitos do CPF — sem ele, o responsável não vai conseguir fazer o primeiro acesso, e a secretaria vai precisar completar o cadastro depois.\n\n" +
+      "Salvar assim mesmo?"
+    );
+    if (!semCpfOk) { document.getElementById("f-resp-cpf").focus(); return; }
+  }
 
+  const editingSnapshotPreCheck = editingStudentId ? students.find(s => s.id === editingStudentId) : null;
+  const conflitos = await checkMatriculaDuplicada({
+    alunoCpf: alunoCpfVal,
+    alunoRg: document.getElementById("f-aluno-rg").value.trim(),
+    respCpf: respCpfVal,
+    respRg: document.getElementById("f-resp-rg").value.trim(),
+    excluirAlunoId: editingStudentId || null,
+    excluirResponsavelId: editingSnapshotPreCheck ? editingSnapshotPreCheck.responsavelId : null,
+  });
+  if (conflitos.length) {
+    showDupMatriculaModal(conflitos, executeSaveMatricula);
+    return;
+  }
+  await executeSaveMatricula();
+});
+
+async function executeSaveMatricula(){
+  const nome = document.getElementById("f-aluno-nome").value.trim();
   const btn = document.getElementById("save-form-btn");
   const labelEl = document.getElementById("save-form-btn-label");
   const originalLabelText = labelEl.textContent;
@@ -4040,6 +4199,14 @@ document.getElementById("save-form-btn").addEventListener("click", async () => {
       cpf: document.getElementById("f-resp-cpf").value.trim() || null,
     };
     if (respNome) {
+      if (!responsavelId && respPayload.cpf) {
+        // Irmãos: se já existe um responsável com esse CPF (ex: outro filho já matriculado),
+        // reaproveita o cadastro em vez de tentar inserir de novo e violar o unique de cpf.
+        const { data: existente, error: buscaErr } = await supabase
+          .from("responsaveis").select("id").eq("cpf", respPayload.cpf).maybeSingle();
+        if (buscaErr) throw buscaErr;
+        if (existente) responsavelId = existente.id;
+      }
       if (responsavelId) {
         const { error: respErr } = await supabase.from("responsaveis").update(respPayload).eq("id", responsavelId);
         if (respErr) throw respErr;
@@ -4135,7 +4302,7 @@ document.getElementById("save-form-btn").addEventListener("click", async () => {
     btn.disabled = false;
     if (!succeeded) labelEl.textContent = originalLabelText;
   }
-});
+}
 
 /* ===================== importar fotos dos alunos ===================== */
 let pickedFotoFiles = [];
