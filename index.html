@@ -2647,8 +2647,7 @@ function bsCurso(prova, bolsa){
 }
 function bsValorHtml(a){
   const p = a.c.prova, v = bsCurso(p, a.c.bolsa);
-  if (!v) return `<div class="bs-valor"><div class="bs-label">Valor do curso</div>
-    <p class="bs-note">O valor do curso da ${esc(p.nome.replace(/^Prova /, 'prova '))} ainda não foi cadastrado. Cadastre em <b>Provas e gabaritos → Editar prova</b>.</p></div>`;
+  if (!v) return ''; // prova sem valor cadastrado (ex.: 8º ano por enquanto): não mostra nada
   const pism = /pism|enem/i.test(a.turma_marcada || '')
     ? `<p class="bs-note bs-alerta">Turma marcada na folha: ${esc(a.turma_marcada)}. Este valor é da tabela de preços da prova; confira se vale para essa turma.</p>` : '';
   return `<div class="bs-valor"><div class="bs-label">Valor do curso com bolsa de ${a.c.bolsa}%</div>
