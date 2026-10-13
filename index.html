@@ -1130,7 +1130,21 @@
   .bs-check input[type=checkbox] { width: 19px; height: 19px; accent-color: var(--accent); flex: none; cursor: pointer; }
   .bs-check .info { font-size: 12px; color: var(--text-muted); }
   .bs-check .data { font-size: 11.5px; font-weight: 700; color: var(--accent-strong); background: var(--accent-soft); border-radius: 20px; padding: 2px 8px; margin-left: 6px; }
-  .bs-check textarea { width: 100%; margin-top: 6px; font: 13px var(--font-body); padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); resize: vertical; min-height: 32px; }
+  /* o aluno aberto fica na largura da tela, mesmo que a tabela precise rolar para o lado */
+  tr.bs-detail .bs-detail-body { position: sticky; left: 16px; width: calc(var(--bs-cw, 100%) - 32px); max-width: 100%; box-sizing: border-box; }
+  .bs-chk { display: inline-flex; align-items: center; gap: 7px; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-muted); }
+  .bs-chk input { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex: none; }
+  .bs-conv-cel { min-width: 140px; max-width: 260px; }
+  .bs-conv-previa { margin-top: 4px; font-size: 12px; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+  .bs-check .data.sem { background: var(--warning-soft); color: var(--warning); }
+  .bs-conv-campos { display: grid; grid-template-columns: minmax(150px, 190px) minmax(0, 1fr); gap: 12px; margin-top: 10px; width: 100%; cursor: default; }
+  .bs-conv-campos .form-field { min-width: 0; }
+  .bs-conv-campos input, .bs-conv-campos textarea { width: 100%; font: 13px var(--font-body); padding: 7px 9px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg); color: var(--text); }
+  .bs-conv-campos textarea { resize: vertical; min-height: 64px; }
+  .bs-conv-campos input:focus, .bs-conv-campos textarea:focus { outline: 2px solid var(--accent-soft-line); border-color: var(--accent); }
+  .bs-conv-feita { display: grid; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px 14px; }
+  .bs-conv-feita .bs-conv-box { border: 0; padding: 0; }
+  @media (max-width: 640px) { .bs-conv-campos { grid-template-columns: minmax(0, 1fr); } }
   .bs-check .vazio { color: var(--text-faint); display: block; }
   .bs-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 16px; }
   .bs-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 18px; display: grid; gap: 12px; min-width: 0; }
@@ -2215,7 +2229,6 @@
           <div class="tabs" role="tablist">
             <button class="tab-btn active" data-bs-tab="res" type="button">Resultados</button>
             <button class="tab-btn" data-bs-tab="dup" type="button">Marcações duplas</button>
-            <button class="tab-btn" data-bs-tab="conv" type="button">Conversas <span id="bs-conv-count"></span></button>
             <button class="tab-btn" data-bs-tab="q" type="button">Por questão</button>
             <button class="tab-btn" data-bs-tab="provas" type="button">Provas e gabaritos</button>
           </div>
@@ -2236,6 +2249,7 @@
             <h2>Classificação <span class="count-chip" id="bs-shown">0</span></h2>
             <div class="filter-row">
               <div class="bs-seg" id="bs-filtro-prova"></div>
+              <div class="bs-seg" id="bs-filtro-conv" aria-label="Filtrar por conversa com a família"></div>
               <div class="search-box">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
                 <input type="text" id="bs-busca" placeholder="Buscar aluno…" aria-label="Buscar aluno">
@@ -2250,7 +2264,7 @@
             <span style="--c:var(--success-soft)">acertou</span>
             <span style="--c:var(--critical-soft)">errou</span>
             <span style="--c:var(--warning-soft)">em branco ou marcação dupla (conta como erro)</span>
-            <span>Clique no aluno para ver a análise e as respostas</span>
+            <span>Clique no aluno para abrir a análise, as respostas e o registro da conversa com a família</span>
           </div>
           <div class="table-scroll">
             <table class="bs-table">
@@ -2261,6 +2275,7 @@
                 <th>Por área</th>
                 <th class="num"><button type="button" class="tab-btn" data-bs-sort="total" style="padding:0">Acertos ▼</button></th>
                 <th class="num">Bolsa</th>
+                <th>Conversa com a família</th>
               </tr></thead>
               <tbody id="bs-tbody"></tbody>
             </table>
@@ -2275,28 +2290,6 @@
         <div class="panel">
           <div class="panel-head"><h2>Questões em branco</h2></div>
           <ul class="bs-check" id="bs-brancos"></ul>
-        </div>
-      </div>
-
-      <!-- Conversas com os pais -->
-      <div class="bs-sub" id="bs-conv" hidden>
-        <p class="bs-note">Marque o aluno quando a conversa com a família for feita. Ele vai para “Conversas realizadas” com a data e uma observação. Todos que estiverem com o painel aberto veem a mudança na hora.</p>
-        <div class="panel">
-          <div class="panel-head">
-            <h2>A conversar <span class="count-chip" id="bs-pend-n">0</span></h2>
-            <div class="filter-row">
-              <div class="bs-seg" id="bs-conv-filtro"></div>
-              <div class="search-box">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-                <input type="text" id="bs-conv-busca" placeholder="Buscar aluno…" aria-label="Buscar aluno pendente">
-              </div>
-            </div>
-          </div>
-          <ul class="bs-check" id="bs-pendentes"></ul>
-        </div>
-        <div class="panel">
-          <div class="panel-head"><h2>Conversas realizadas <span class="count-chip" id="bs-feitas-n">0</span></h2></div>
-          <ul class="bs-check" id="bs-feitas"></ul>
         </div>
       </div>
 
@@ -2590,7 +2583,7 @@ const BS_FAIXAS_PADRAO = [
 const bs = {
   provas: [], alunos: [], edicao: null,
   aba: 'res', filtroProva: 'all', busca: '', sortKey: 'total', sortDir: -1, aberto: null,
-  convFiltro: 'all', convBusca: '', canal: null, iniciado: false,
+  convStatus: 'all', canal: null, iniciado: false,
   editProva: null, editAluno: null, respostas: [], confirmExcluir: null
 };
 const bsEl = id => document.getElementById(id);
@@ -2690,20 +2683,25 @@ function bsRenderTudo(deFora){
   sel.innerHTML = edicoes.length ? edicoes.map(e => `<option value="${esc(e)}" ${e === bs.edicao ? 'selected' : ''}>${esc(e)}</option>`).join('') : '<option value="">Nenhuma prova cadastrada</option>';
   const provas = bsProvasDaEdicao();
   if (bs.filtroProva !== 'all' && !provas.some(p => p.id === bs.filtroProva)) bs.filtroProva = 'all';
-  if (bs.convFiltro !== 'all' && !provas.some(p => p.id === bs.convFiltro)) bs.convFiltro = 'all';
   const seg = (alvo, atual) => `<button type="button" data-v="all" class="${atual === 'all' ? 'active' : ''}">Todas</button>` +
     provas.map(p => `<button type="button" data-v="${p.id}" class="${atual === p.id ? 'active' : ''}">${esc(p.nome.replace(/^Prova d[oa] /, ''))}</button>`).join('');
   bsEl('bs-filtro-prova').innerHTML = seg('res', bs.filtroProva);
-  bsEl('bs-conv-filtro').innerHTML = seg('conv', bs.convFiltro);
   const lista = bsAlunosDaEdicao();
-  bsEl('bs-conv-count').textContent = lista.length ? `${lista.filter(a => a.conversa_feita).length}/${lista.length}` : '';
-  bsRenderResultados(lista);
-  bsRenderDuplas(lista);
-  // não redesenha a lista de conversas enquanto alguém digita uma observação nela
+  const nFeitas = lista.filter(a => a.conversa_feita).length;
+  bsEl('bs-filtro-conv').innerHTML = [['all', 'Todas as conversas'], ['pend', `A conversar (${lista.length - nFeitas})`], ['feita', `Conversas realizadas (${nFeitas})`]]
+    .map(([v, t]) => `<button type="button" data-v="${v}" class="${bs.convStatus === v ? 'active' : ''}">${t}</button>`).join('');
+  // não redesenha as telas de conversa enquanto alguém digita a data ou o que foi acordado (mudança vinda de outro computador)
   const ativo = document.activeElement;
-  if (!(deFora && ativo && ativo.matches && ativo.matches('#bs-feitas textarea'))) bsRenderConversas(lista);
+  const digitando = !!(deFora && ativo && ativo.closest && ativo.closest('.bs-conv-campos'));
+  if (!digitando) bsRenderResultados(lista);
+  bsRenderDuplas(lista);
   bsRenderQuestoes(lista);
   bsRenderProvas(lista);
+  if (bs.focoObs){
+    const el = bsEl(`bso-r-${bs.focoObs}`);
+    bs.focoObs = null;
+    if (el){ el.focus(); el.scrollIntoView({ block: 'nearest' }); }
+  }
 }
 
 /* ---------- Resultados ---------- */
@@ -2726,11 +2724,20 @@ function bsRenderResultados(lista){
       <span class="n">${cont[i]}</span><div class="bar" style="height:${Math.max(2, cont[i] / max * 100)}%;opacity:${0.35 + 0.65 * (i + 1) / valores.length}"></div>
       <span class="lbl">${v}%</span><span class="rng">${faixaTxt(v)}</span></div>`).join('') : '<div class="empty-note">Cadastre uma prova com a tabela de bolsa.</div>';
 
-  let rows = lista.filter(a => (bs.filtroProva === 'all' || a.prova_id === bs.filtroProva) && (!bs.busca || bsNorm(a.nome).includes(bs.busca)));
-  rows = rows.slice().sort((x, y) => bs.sortKey === 'nome' ? bs.sortDir * x.nome.localeCompare(y.nome, 'pt') : bs.sortDir * (x.pos - y.pos) * -1);
+  // o aluno que está aberto continua na lista mesmo que a conversa dele acabe de mudar de situação
+  const passaConv = a => bs.convStatus === 'all' || a.id === bs.aberto || (bs.convStatus === 'pend' ? !a.conversa_feita : !!a.conversa_feita);
+  let rows = lista.filter(a => (bs.filtroProva === 'all' || a.prova_id === bs.filtroProva) && passaConv(a) && (!bs.busca || bsNorm(a.nome).includes(bs.busca)));
+  rows = rows.slice().sort((x, y) => {
+    if (bs.sortKey === 'nome') return bs.sortDir * x.nome.localeCompare(y.nome, 'pt');
+    if (bs.convStatus === 'feita') return (y.conversa_data || '').localeCompare(x.conversa_data || '') || x.pos - y.pos; // mais recentes primeiro
+    return bs.sortDir * (x.pos - y.pos) * -1;
+  });
   bsEl('bs-shown').textContent = rows.length;
   bsEl('bs-tbody').innerHTML = rows.map(a => {
-    const flags = (a.c.duplas ? `<span class="bs-flag">marcou duas</span>` : '') + (a.c.brancos ? `<span class="bs-flag soft">${a.c.brancos} em branco</span>` : '') + (a.conversa_feita ? `<span class="bs-flag done">conversa feita</span>` : '');
+    const flags = (a.c.duplas ? `<span class="bs-flag">marcou duas</span>` : '') + (a.c.brancos ? `<span class="bs-flag soft">${a.c.brancos} em branco</span>` : '');
+    const conversa = a.conversa_feita
+      ? `<span class="bs-flag done" title="${a.conversa_obs ? esc(a.conversa_obs) : 'Sem observação registrada'}">✓ ${a.conversa_data ? bsData(a.conversa_data) : 'sem data'}</span>${a.conversa_obs ? '<div class="bs-conv-previa">' + esc(a.conversa_obs) + '</div>' : ''}`
+      : `<label class="bs-chk"><input type="checkbox" data-bs-conv-check="${a.id}" aria-label="Marcar conversa com a família de ${esc(a.nome)} como realizada"><span>A conversar</span></label>`;
     const areas = Object.entries(a.c.porArea).map(([k, v]) => `${bsAbrevArea(k)} ${v.ok}/${v.n}`).join(' · ');
     const linha = `<tr data-bs-id="${a.id}" tabindex="0" aria-expanded="${bs.aberto === a.id}">
       <td class="num pos">${a.pos}º</td>
@@ -2738,10 +2745,18 @@ function bsRenderResultados(lista){
       <td><span class="bs-prova-tag">${esc(a.c.prova.nome.replace(/^Prova d[oa] /, ''))}</span></td>
       <td class="areas">${areas}</td>
       <td class="num bs-total">${a.c.total}</td>
-      <td class="num">${bsBolsaTag(a.c.bolsa)}</td></tr>`;
-    return linha + (bs.aberto === a.id ? `<tr class="bs-detail"><td colspan="6">${bsDetalhe(a, lista)}</td></tr>` : '');
-  }).join('') || `<tr><td colspan="6"><div class="empty-note">${lista.length ? 'Nenhum aluno encontrado.' : 'Nenhum aluno cadastrado nesta edição. Use “Adicionar aluno”.'}</div></td></tr>`;
+      <td class="num">${bsBolsaTag(a.c.bolsa)}</td>
+      <td class="bs-conv-cel">${conversa}</td></tr>`;
+    return linha + (bs.aberto === a.id ? `<tr class="bs-detail"><td colspan="7">${bsDetalhe(a, lista)}</td></tr>` : '');
+  }).join('') || `<tr><td colspan="7"><div class="empty-note">${lista.length ? 'Nenhum aluno encontrado.' : 'Nenhum aluno cadastrado nesta edição. Use “Adicionar aluno”.'}</div></td></tr>`;
+  bsAjustarLargura();
 }
+function bsAjustarLargura(){
+  const box = bsEl('bs-tbody').closest('.table-scroll');
+  if (box && box.clientWidth) bsEl('bs-tbody').closest('table').style.setProperty('--bs-cw', box.clientWidth + 'px');
+}
+/* a seção começa escondida: mede a largura assim que ela aparece e a cada mudança de tamanho da tela */
+(() => { const box = bsEl('bs-tbody').closest('.table-scroll'); if (box && window.ResizeObserver) new ResizeObserver(bsAjustarLargura).observe(box); })();
 
 function bsDetalhe(a, lista){
   const p = a.c.prova;
@@ -2789,10 +2804,10 @@ function bsDetalhe(a, lista){
   const cell = (m, i) => { const cls = m.vazio ? 'nx' : m.ok ? 'ok' : 'no'; const s = m.branco ? '–' : m.dupla ? '2×' : m.r.toUpperCase();
     return `<div class="bs-q ${cls}" title="Q${i + 1} (${esc(bsTema(p, i + 1).conteudo || bsTema(p, i + 1).assunto)}): marcou ${s}, gabarito ${g[i].toUpperCase()}"><i>${bsQ(i + 1)}</i>${s}</div>`; };
   const conv = a.conversa_feita
-    ? `<span>Conversa com a família realizada em <b>${bsData(a.conversa_data)}</b>${a.conversa_obs ? ': ' + esc(a.conversa_obs) : '.'}</span><button type="button" class="btn btn-ghost" data-bs-conv-off="${a.id}">Desmarcar conversa</button>`
-    : `<span>Conversa com a família ainda não realizada.</span><button type="button" class="btn btn-primary" data-bs-conv-on="${a.id}">Marcar conversa como realizada</button>`;
+    ? `<div class="bs-conv-feita"><div class="bs-conv-box"><span>Conversa com a família <b>realizada</b>.</span><button type="button" class="btn btn-ghost" data-bs-conv-off="${a.id}">Desmarcar conversa</button></div>${bsConvCampos(a, 'r')}</div>`
+    : `<div class="bs-conv-box"><span>Conversa com a família ainda não realizada.</span><button type="button" class="btn btn-primary" data-bs-conv-on="${a.id}">Marcar conversa como realizada</button></div>`;
   return `<div class="bs-detail-body">
-    <div class="bs-conv-box">${conv}</div>
+    ${conv}
     <p class="bs-resumo">${frase}</p>
     <div class="bs-areas">${blocos}</div>
     <p class="bs-note">A barra mostra o aproveitamento do aluno em cada assunto; o traço vertical marca a média de todos que fizeram a ${esc(p.nome.replace(/^Prova /, 'prova '))}.</p>
@@ -2817,23 +2832,30 @@ function bsRenderDuplas(lista){
     || '<li><span class="vazio">Nenhuma questão em branco nesta edição.</span></li>';
 }
 
-/* ---------- Conversas ---------- */
-function bsRenderConversas(lista){
-  const feitas = lista.filter(a => a.conversa_feita).sort((x, y) => (y.conversa_data || '').localeCompare(x.conversa_data || '') || x.nome.localeCompare(y.nome, 'pt'));
-  const pend = lista.filter(a => !a.conversa_feita && (bs.convFiltro === 'all' || a.prova_id === bs.convFiltro) && (!bs.convBusca || bsNorm(a.nome).includes(bs.convBusca)));
-  const totalPend = lista.length - feitas.length;
-  bsEl('bs-pend-n').textContent = totalPend;
-  bsEl('bs-feitas-n').textContent = feitas.length;
-  const info = a => `<span class="info">${a.pos}º lugar · ${esc(a.c.prova.nome.replace(/^Prova /, 'prova '))} · ${a.c.total} acertos</span>`;
-  bsEl('bs-pendentes').innerHTML = pend.map(a => `<li>
-      <label for="bsc-${a.id}"><input type="checkbox" id="bsc-${a.id}" data-bs-conv-on="${a.id}"><span><b>${esc(a.nome)}</b><br>${info(a)}</span></label>
-      ${bsBolsaTag(a.c.bolsa)}</li>`).join('')
-    || `<li><span class="vazio">${totalPend ? 'Nenhum aluno pendente com esse filtro.' : 'Todas as conversas foram realizadas.'}</span></li>`;
-  bsEl('bs-feitas').innerHTML = feitas.map(a => `<li>
-      <div style="min-width:0"><b>${esc(a.nome)}</b><span class="data">${bsData(a.conversa_data)}</span><br>${info(a)} · bolsa ${a.c.bolsa}%
-        <textarea id="bso-${a.id}" data-bs-obs="${a.id}" rows="1" placeholder="Observação da conversa (opcional)">${esc(a.conversa_obs || '')}</textarea></div>
-      <button type="button" class="btn btn-ghost" data-bs-conv-off="${a.id}">Desmarcar</button></li>`).join('')
-    || '<li><span class="vazio">Nenhuma conversa registrada ainda. Marque um aluno na lista acima quando falar com a família dele.</span></li>';
+/* ---------- Conversa com a família ---------- */
+/* data da conversa e "o que foi acordado", dentro do aluno aberto em Resultados.
+   pref compõe o id dos campos ('r' = detalhe do aluno) */
+function bsConvCampos(a, pref){
+  return `<div class="bs-conv-campos">
+    <div class="form-field"><label for="bsd-${pref}-${a.id}">Data da conversa</label>
+      <input type="date" id="bsd-${pref}-${a.id}" data-bs-data="${a.id}" value="${esc(a.conversa_data || '')}"></div>
+    <div class="form-field"><label for="bso-${pref}-${a.id}">O que foi acordado</label>
+      <textarea id="bso-${pref}-${a.id}" data-bs-obs="${a.id}" rows="3" placeholder="Ex.: família vai matricular o aluno em janeiro; pediu desconto no material; retornar a ligação na sexta…">${esc(a.conversa_obs || '')}</textarea></div>
+  </div>`;
+}
+/* salva a data ou a observação assim que a pessoa sai do campo */
+function bsEditarConv(el){
+  const dEl = el.closest('[data-bs-data]'), oEl = el.closest('[data-bs-obs]');
+  const campoEl = dEl || oEl; if (!campoEl) return false;
+  const id = dEl ? dEl.dataset.bsData : oEl.dataset.bsObs;
+  const a = bs.alunos.find(x => x.id === id); if (!a) return true;
+  const campo = dEl ? 'conversa_data' : 'conversa_obs';
+  const valor = (dEl ? campoEl.value : campoEl.value.trim()) || null;
+  if ((a[campo] || null) === valor) return true;
+  const antes = a[campo]; a[campo] = valor;
+  bsSalvarAluno(id, { [campo]: valor }, () => { a[campo] = antes; });
+  if (dEl) bsRenderTudo(); // a lista é ordenada pela data da conversa
+  return true;
 }
 async function bsSalvarAluno(id, campos, desfazer){
   const { error } = await supabase.from('bolsao_alunos').update({ ...campos, updated_at: new Date().toISOString() }).eq('id', id);
@@ -2851,7 +2873,9 @@ function bsConversa(id, feita){
   const a = bs.alunos.find(x => x.id === id); if (!a) return;
   const antes = { conversa_feita: a.conversa_feita, conversa_data: a.conversa_data, conversa_obs: a.conversa_obs };
   const novo = feita ? { conversa_feita: true, conversa_data: bsHoje() } : { conversa_feita: false, conversa_data: null, conversa_obs: null };
-  Object.assign(a, novo); bsRenderTudo();
+  Object.assign(a, novo);
+  if (feita){ bs.aberto = id; bs.focoObs = id; } // abre o aluno e deixa o cursor em "O que foi acordado"
+  bsRenderTudo();
   bsSalvarAluno(id, novo, () => Object.assign(a, antes));
 }
 
@@ -3051,17 +3075,16 @@ function bsLigarEventos(){
   document.querySelectorAll('[data-bs-tab]').forEach(b => b.addEventListener('click', () => {
     bs.aba = b.dataset.bsTab;
     document.querySelectorAll('[data-bs-tab]').forEach(x => x.classList.toggle('active', x === b));
-    ['res', 'dup', 'conv', 'q', 'provas'].forEach(k => bsEl('bs-' + k).hidden = k !== bs.aba);
+    ['res', 'dup', 'q', 'provas'].forEach(k => bsEl('bs-' + k).hidden = k !== bs.aba);
   }));
   bsEl('bs-edicao').addEventListener('change', e => {
-    bs.edicao = e.target.value; bs.aberto = null; bs.filtroProva = 'all'; bs.convFiltro = 'all';
+    bs.edicao = e.target.value; bs.aberto = null; bs.filtroProva = 'all'; bs.convStatus = 'all';
     try { localStorage.setItem('percurso_bolsao_edicao', bs.edicao); } catch(err){}
     bsRenderTudo();
   });
   bsEl('bs-filtro-prova').addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (b){ bs.filtroProva = b.dataset.v; bsRenderTudo(); } });
-  bsEl('bs-conv-filtro').addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (b){ bs.convFiltro = b.dataset.v; bsRenderTudo(); } });
+  bsEl('bs-filtro-conv').addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (b){ bs.convStatus = b.dataset.v; bs.aberto = null; bsRenderTudo(); } });
   bsEl('bs-busca').addEventListener('input', e => { bs.busca = bsNorm(e.target.value.trim()); bsRenderTudo(); });
-  bsEl('bs-conv-busca').addEventListener('input', e => { bs.convBusca = bsNorm(e.target.value.trim()); bsRenderTudo(); });
   document.querySelectorAll('[data-bs-sort]').forEach(b => b.addEventListener('click', () => {
     const k = b.dataset.bsSort;
     if (bs.sortKey === k) bs.sortDir *= -1; else { bs.sortKey = k; bs.sortDir = k === 'nome' ? 1 : -1; }
@@ -3072,6 +3095,9 @@ function bsLigarEventos(){
   const tbody = bsEl('bs-tbody');
   const alternar = tr => { const id = tr.dataset.bsId; bs.aberto = bs.aberto === id ? null : id; bsRenderTudo(); const de = tbody.querySelector(`tr[data-bs-id="${id}"]`); if (de) de.focus(); };
   tbody.addEventListener('click', e => {
+    // caixinha "A conversar": marca a conversa como realizada (o clique no texto da caixinha chega aqui duas vezes; só o da caixinha conta)
+    const chk = e.target.closest('.bs-chk');
+    if (chk){ const inp = e.target.closest('input[data-bs-conv-check]'); if (inp) bsConversa(inp.dataset.bsConvCheck, true); return; }
     const on = e.target.closest('[data-bs-conv-on]'), off = e.target.closest('[data-bs-conv-off]'), ed = e.target.closest('[data-bs-edit-aluno]');
     if (on) return bsConversa(on.dataset.bsConvOn, true);
     if (off) return bsConversa(off.dataset.bsConvOff, false);
@@ -3079,15 +3105,7 @@ function bsLigarEventos(){
     const tr = e.target.closest('tr[data-bs-id]'); if (tr) alternar(tr);
   });
   tbody.addEventListener('keydown', e => { const tr = e.target.closest('tr[data-bs-id]'); if (tr && e.target === tr && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); alternar(tr); } });
-  bsEl('bs-pendentes').addEventListener('change', e => { const cb = e.target.closest('[data-bs-conv-on]'); if (cb && cb.checked) bsConversa(cb.dataset.bsConvOn, true); });
-  bsEl('bs-feitas').addEventListener('click', e => { const b = e.target.closest('[data-bs-conv-off]'); if (b) bsConversa(b.dataset.bsConvOff, false); });
-  bsEl('bs-feitas').addEventListener('change', e => {
-    const t = e.target.closest('[data-bs-obs]'); if (!t) return;
-    const a = bs.alunos.find(x => x.id === t.dataset.bsObs); const obs = t.value.trim();
-    if (!a || (a.conversa_obs || '') === obs) return;
-    const antes = a.conversa_obs; a.conversa_obs = obs || null;
-    bsSalvarAluno(a.id, { conversa_obs: obs || null }, () => { a.conversa_obs = antes; });
-  });
+  tbody.addEventListener('change', e => bsEditarConv(e.target));
   bsEl('bs-add-aluno').addEventListener('click', () => bsAbrirAluno(null));
   bsEl('bs-add-prova').addEventListener('click', () => bsAbrirProva(null));
   bsEl('bs-prova-cards').addEventListener('click', async e => {
