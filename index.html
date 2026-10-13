@@ -1132,6 +1132,11 @@
   .bs-check .data { font-size: 11.5px; font-weight: 700; color: var(--accent-strong); background: var(--accent-soft); border-radius: 20px; padding: 2px 8px; margin-left: 6px; }
   /* o aluno aberto fica na largura da tela, mesmo que a tabela precise rolar para o lado */
   tr.bs-detail .bs-detail-body { position: sticky; left: 16px; width: calc(var(--bs-cw, 100%) - 32px); max-width: 100%; box-sizing: border-box; }
+  .bs-topo { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 12px; align-items: start; }
+  .bs-valor { display: grid; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; min-width: 0; }
+  .bs-valor-linha { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; font-size: 13px; color: var(--text-muted); }
+  .bs-valor-num { font-family: var(--font-mono); font-size: 24px; font-weight: 700; color: var(--accent-strong); font-variant-numeric: tabular-nums; }
+  .bs-alerta { color: var(--warning); }
   .bs-chk { display: inline-flex; align-items: center; gap: 7px; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-muted); }
   .bs-chk input { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex: none; }
   .bs-conv-cel { min-width: 140px; max-width: 260px; }
@@ -2323,6 +2328,8 @@
             <div class="form-field"><label for="bp-data">Data de aplicação</label><input id="bp-data" type="date"></div>
             <div class="form-field"><label for="bp-turmas">Turmas que fazem esta prova</label><input id="bp-turmas" placeholder="Ex.: CEFET/IFET/COLUNI, PISM"></div>
             <div class="form-field"><label for="bp-n">Número de questões</label><input id="bp-n" type="number" min="1" max="120" value="30"></div>
+            <div class="form-field"><label for="bp-valor">Valor integral de cada parcela do curso (R$)</label><input id="bp-valor" inputmode="decimal" placeholder="Ex.: 418,00" autocomplete="off"></div>
+            <div class="form-field"><label for="bp-parcelas">Número de parcelas</label><input id="bp-parcelas" type="number" min="1" max="36" value="10"></div>
             <div class="form-field"><label for="bp-copiar">Copiar assuntos e tabela de bolsa de</label><select id="bp-copiar"><option value="">Não copiar</option></select></div>
           </div>
           <div>
@@ -2629,6 +2636,26 @@ function bsAlunosDaEdicao(){
   return lista;
 }
 function bsProvasDaEdicao(){ return bs.provas.filter(p => p.edicao === bs.edicao).sort((a, b) => a.nome.localeCompare(b.nome, 'pt')); }
+/* valor do curso: parcela integral da prova menos a bolsa, com duas casas decimais (contas em centavos para não errar o arredondamento) */
+const bsBRL = cents => 'R$ ' + (cents / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+function bsCurso(prova, bolsa){
+  if (prova.valor_parcela == null) return null;
+  const n = Number(prova.num_parcelas) || 10;
+  const base = Math.round(Number(prova.valor_parcela) * 100);
+  const parcela = Math.round(base * (100 - bolsa) / 100);
+  return { n, base, parcela, total: parcela * n, totalBase: base * n, desconto: base - parcela };
+}
+function bsValorHtml(a){
+  const p = a.c.prova, v = bsCurso(p, a.c.bolsa);
+  if (!v) return `<div class="bs-valor"><div class="bs-label">Valor do curso</div>
+    <p class="bs-note">O valor do curso da ${esc(p.nome.replace(/^Prova /, 'prova '))} ainda não foi cadastrado. Cadastre em <b>Provas e gabaritos → Editar prova</b>.</p></div>`;
+  const pism = /pism|enem/i.test(a.turma_marcada || '')
+    ? `<p class="bs-note bs-alerta">Turma marcada na folha: ${esc(a.turma_marcada)}. Este valor é da tabela de preços da prova; confira se vale para essa turma.</p>` : '';
+  return `<div class="bs-valor"><div class="bs-label">Valor do curso com bolsa de ${a.c.bolsa}%</div>
+    <div class="bs-valor-linha"><b class="bs-valor-num">${bsBRL(v.parcela)}</b><span>por parcela · ${v.n} parcelas</span></div>
+    <div class="bs-note">Total no ano: <b>${bsBRL(v.total)}</b></div>
+    <div class="bs-note">Valor integral: ${bsBRL(v.base)} por parcela (${bsBRL(v.totalBase)} no ano). Desconto de ${bsBRL(v.desconto)} por parcela.</div>${pism}</div>`;
+}
 function bsBolsaTag(b){ const cls = b <= 10 ? 'b1' : b >= 80 ? 'b4' : b >= 40 ? 'b3' : ''; return `<span class="bs-bolsa ${cls}">${b}%</span>`; }
 function bsAbrevArea(a){ return a === 'Português' ? 'Port.' : a === 'Matemática' ? 'Mat.' : a; }
 
@@ -2807,7 +2834,7 @@ function bsDetalhe(a, lista){
     ? `<div class="bs-conv-feita"><div class="bs-conv-box"><span>Conversa com a família <b>realizada</b>.</span><button type="button" class="btn btn-ghost" data-bs-conv-off="${a.id}">Desmarcar conversa</button></div>${bsConvCampos(a, 'r')}</div>`
     : `<div class="bs-conv-box"><span>Conversa com a família ainda não realizada.</span><button type="button" class="btn btn-primary" data-bs-conv-on="${a.id}">Marcar conversa como realizada</button></div>`;
   return `<div class="bs-detail-body">
-    ${conv}
+    <div class="bs-topo">${bsValorHtml(a)}${conv}</div>
     <p class="bs-resumo">${frase}</p>
     <div class="bs-areas">${blocos}</div>
     <p class="bs-note">A barra mostra o aproveitamento do aluno em cada assunto; o traço vertical marca a média de todos que fizeram a ${esc(p.nome.replace(/^Prova /, 'prova '))}.</p>
@@ -2904,7 +2931,8 @@ function bsRenderProvas(lista){
       <div class="bs-label">Gabarito</div>
       <div class="bs-keygrid">${[...p.gabarito].map((g, i) => `<div class="bs-key"><span>${bsQ(i + 1)}</span><b>${g.toUpperCase()}</b></div>`).join('')}</div>
       <div class="bs-label">Tabela de bolsa</div>
-      <div class="bs-faixas">${(p.tabela_bolsa || []).map(f => `<span>${f.min === f.max ? f.min : f.min + ' a ' + f.max} acertos: <b>${f.bolsa}%</b></span>`).join('') || '<span>Sem tabela</span>'}</div>
+      <div class="bs-faixas">${(p.tabela_bolsa || []).map(f => { const v = bsCurso(p, Number(f.bolsa)); return `<span>${f.min === f.max ? f.min : f.min + ' a ' + f.max} acertos: <b>${f.bolsa}%</b>${v ? ' · ' + bsBRL(v.parcela) : ''}</span>`; }).join('') || '<span>Sem tabela</span>'}</div>
+      <div class="bs-note">${p.valor_parcela != null ? 'Curso: ' + bsBRL(Math.round(Number(p.valor_parcela) * 100)) + ' por parcela, em ' + (p.num_parcelas || 10) + ' parcelas (integral).' : 'Valor do curso ainda não cadastrado. Use “Editar prova”.'}</div>
       <div class="bs-card-actions">
         <button type="button" class="btn btn-ghost" data-bs-edit-prova="${p.id}">Editar prova</button>
         ${conf ? `<button type="button" class="btn btn-danger" data-bs-del-prova-ok="${p.id}">Confirmar: excluir prova e ${n} alunos</button><button type="button" class="btn btn-ghost" data-bs-del-prova-cancel>Cancelar</button>`
@@ -2925,6 +2953,8 @@ function bsAbrirProva(id){
   bsEl('bp-data').value = p && p.data_aplicacao ? p.data_aplicacao : '';
   bsEl('bp-turmas').value = p ? (p.turmas || []).join(', ') : '';
   bsEl('bp-n').value = p ? p.gabarito.length : 30;
+  bsEl('bp-valor').value = p && p.valor_parcela != null ? Number(p.valor_parcela).toFixed(2).replace('.', ',') : '';
+  bsEl('bp-parcelas').value = p && p.num_parcelas ? p.num_parcelas : 10;
   bsEl('bp-copiar').innerHTML = '<option value="">Não copiar</option>' + bs.provas.filter(x => !p || x.id !== p.id).map(x => `<option value="${x.id}">${esc(x.edicao)} · ${esc(x.nome)}</option>`).join('');
   bsEl('bp-qbody').innerHTML = '';
   bsMontarQuestoes(p ? p.gabarito.length : 30, p);
@@ -2980,10 +3010,15 @@ async function bsSalvarProva(e){
     turmas: bsEl('bp-turmas').value.split(',').map(s => s.trim()).filter(Boolean),
     gabarito: qs.map(x => x.g).join(''),
     temas: qs.map(x => ({ q: x.q, area: x.area || 'Geral', assunto: x.assunto || 'Sem assunto definido', conteudo: x.conteudo })),
-    tabela_bolsa: faixas, updated_at: new Date().toISOString()
+    tabela_bolsa: faixas, updated_at: new Date().toISOString(),
+    valor_parcela: null, num_parcelas: Math.max(1, Math.round(Number(bsEl('bp-parcelas').value) || 10))
   };
+  const textoValor = bsEl('bp-valor').value.trim().replace(/^R\$\s*/i, '').replace(/\./g, '').replace(',', '.');
+  const valor = textoValor === '' ? null : Number(textoValor);
+  if (valor !== null && isFinite(valor) && valor >= 0) dados.valor_parcela = Math.round(valor * 100) / 100;
   const faltando = qs.filter(x => !x.g).map(x => x.q);
   let erro = '';
+  if (valor !== null && !(isFinite(valor) && valor >= 0)) erro = 'O valor da parcela precisa ser um número, por exemplo 418,00.';
   if (!dados.edicao) erro = 'Informe a edição do bolsão (ex.: Bolsão 2028).';
   else if (!dados.nome) erro = 'Informe o nome da prova.';
   else if (faltando.length) erro = `Escolha a resposta certa das questões ${faltando.slice(0, 8).join(', ')}${faltando.length > 8 ? '…' : ''}.`;
