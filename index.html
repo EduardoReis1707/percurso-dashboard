@@ -328,6 +328,21 @@
     text-transform: uppercase;
   }
 
+  .ano-switch { padding: 12px 6px 2px; margin-top: 8px; border-top: 1px solid var(--border); }
+  .ano-switch-label {
+    display: block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--text-faint); margin-bottom: 6px; padding: 0 4px;
+  }
+  .ano-switch-row { display: flex; gap: 6px; align-items: center; }
+  .ano-switch-row select.chip-select { width: 100%; }
+  .ano-add-btn {
+    width: 30px; height: 30px; flex-shrink: 0; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--surface-2); color: var(--text-muted); font-size: 17px; font-weight: 700; line-height: 1;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    transition: background-color .18s var(--ease-out-quart), color .18s var(--ease-out-quart);
+  }
+  .ano-add-btn:hover { background: var(--accent-soft); color: var(--accent-strong); }
+
   nav.primary { display: flex; flex-direction: column; gap: 2px; margin-top: 4px; }
   .nav-label {
     font-size: 10.5px;
@@ -932,6 +947,7 @@
     nav.primary { flex-direction: row; }
     .nav-label { display: none; }
     .sidebar-foot { display: none; }
+    .ano-switch { display: none; }
     .stat-grid { grid-template-columns: 1fr 1fr; }
     .form-fields { grid-template-columns: 1fr; }
     .form-field.span2, .form-field.span3 { grid-column: span 1; }
@@ -1053,6 +1069,119 @@
 
   @media(max-width:760px){#view-simulados .kpis{grid-template-columns:repeat(2,1fr);}#view-simulados .top3{grid-template-columns:1fr;}#view-simulados .stu-grid{grid-template-columns:1fr;}#view-simulados thead th:nth-child(4), #view-simulados tbody td:nth-child(4){display:none;}
   }
+
+  /* ---------- Bolsão (prova de bolsas) ---------- */
+  .bs-head-right { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .bs-sub { display: grid; gap: 18px; }
+  .bs-sub[hidden] { display: none; }
+  .bs-stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
+  .bs-dist { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 10px; align-items: end; height: 160px; padding: 16px 18px; }
+  .bs-dist .col { display: grid; grid-template-rows: auto 1fr auto auto; height: 100%; gap: 4px; text-align: center; min-width: 0; }
+  .bs-dist .bar { align-self: end; border-radius: 6px 6px 0 0; min-height: 3px; background: var(--accent); }
+  .bs-dist .n { font-family: var(--font-mono); font-weight: 600; font-size: 13px; }
+  .bs-dist .lbl { font-family: var(--font-display); font-weight: 700; font-size: 13px; }
+  .bs-dist .rng { font-size: 11px; color: var(--text-faint); }
+  .bs-seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .bs-seg button { border: 0; background: var(--surface); color: var(--text); font: 600 12.5px var(--font-body); padding: 7px 12px; cursor: pointer; }
+  .bs-seg button + button { border-left: 1px solid var(--border); }
+  .bs-seg button.active { background: var(--accent); color: #fff; }
+  .bs-legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--text-muted); padding: 10px 18px 0; }
+  .bs-legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; background: var(--c); }
+  .bs-table td.num, .bs-table th.num { text-align: right; }
+  .bs-table .pos { color: var(--text-faint); font-family: var(--font-mono); width: 3em; }
+  .bs-table .nome { font-weight: 600; }
+  .bs-table .areas { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+  .bs-total { font-family: var(--font-mono); font-weight: 700; font-size: 15px; }
+  .bs-bolsa { display: inline-block; min-width: 54px; text-align: center; font-family: var(--font-display); font-weight: 700; font-size: 14px; padding: 3px 8px; border-radius: 6px; background: var(--accent-soft); color: var(--accent-strong); }
+  .bs-bolsa.b1 { background: var(--surface-2); color: var(--text-muted); }
+  .bs-bolsa.b3 { background: var(--accent); color: #fff; }
+  .bs-bolsa.b4 { background: var(--accent-strong); color: #fff; }
+  .bs-flag { font-size: 11px; font-weight: 700; border-radius: 4px; padding: 1px 6px; margin-left: 6px; white-space: nowrap; background: var(--critical-soft); color: var(--critical); }
+  .bs-flag.soft { background: var(--warning-soft); color: var(--warning); }
+  .bs-flag.done { background: var(--accent-soft); color: var(--accent-strong); }
+  .bs-prova-tag { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; background: var(--info-soft); color: var(--info); white-space: nowrap; }
+  tr.bs-detail td { background: var(--surface-2); cursor: default; }
+  tr.bs-detail:hover td { background: var(--surface-2); }
+  .bs-detail-body { display: grid; gap: 16px; padding: 6px 0; }
+  .bs-conv-box { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; }
+  .bs-resumo { margin: 0; font-size: 14px; max-width: 80ch; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+  .bs-areas { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 18px; }
+  .bs-area { display: grid; gap: 10px; align-content: start; min-width: 0; }
+  .bs-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-faint); }
+  .bs-tema { display: grid; gap: 4px; min-width: 0; }
+  .bs-tema-top { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+  .bs-tema-top b { font-family: var(--font-mono); }
+  .bs-track { position: relative; height: 8px; border-radius: 4px; background: var(--border); }
+  .bs-fill { position: absolute; inset: 0 auto 0 0; border-radius: 4px; }
+  .bs-media { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--text); opacity: .55; }
+  .bs-tema-err { font-size: 12px; color: var(--text-muted); overflow-wrap: anywhere; }
+  .bs-grid { display: grid; grid-template-columns: repeat(15, minmax(32px, 1fr)); gap: 4px; min-width: 540px; }
+  .bs-q { border-radius: 5px; text-align: center; padding: 4px 0; font: 12px var(--font-mono); line-height: 1.25; }
+  .bs-q i { display: block; font-style: normal; font-size: 10px; opacity: .7; }
+  .bs-q.ok { background: var(--success-soft); color: var(--success); }
+  .bs-q.no { background: var(--critical-soft); color: var(--critical); }
+  .bs-q.nx { background: var(--warning-soft); color: var(--warning); }
+  .bs-note { font-size: 12.5px; color: var(--text-muted); margin: 0; }
+  .bs-aviso { background: var(--warning-soft); color: var(--warning); border-radius: 8px; padding: 10px 14px; font-size: 13px; }
+  .bs-check { list-style: none; margin: 0; padding: 0; }
+  .bs-check li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 18px; border-bottom: 1px solid var(--border); }
+  .bs-check li:last-child { border-bottom: 0; }
+  .bs-check label { display: flex; align-items: center; gap: 12px; cursor: pointer; min-width: 0; }
+  .bs-check input[type=checkbox] { width: 19px; height: 19px; accent-color: var(--accent); flex: none; cursor: pointer; }
+  .bs-check .info { font-size: 12px; color: var(--text-muted); }
+  .bs-check .data { font-size: 11.5px; font-weight: 700; color: var(--accent-strong); background: var(--accent-soft); border-radius: 20px; padding: 2px 8px; margin-left: 6px; }
+  .bs-check textarea { width: 100%; margin-top: 6px; font: 13px var(--font-body); padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); resize: vertical; min-height: 32px; }
+  .bs-check .vazio { color: var(--text-faint); display: block; }
+  .bs-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 16px; }
+  .bs-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 18px; display: grid; gap: 12px; min-width: 0; }
+  .bs-card.alerta { border-left: 4px solid var(--critical); }
+  .bs-card h3 { margin: 0; font-family: var(--font-display); font-size: 16px; }
+  .bs-card .meta { font-size: 12.5px; color: var(--text-muted); }
+  .bs-dq { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; align-items: center; font-size: 13px; }
+  .bs-dq b { font-family: var(--font-mono); }
+  .bs-qchart { display: grid; gap: 5px; padding: 14px 18px; }
+  .bs-qrow { display: grid; grid-template-columns: 42px 28px minmax(0, 1fr) 46px; gap: 10px; align-items: center; font-size: 12.5px; }
+  .bs-qrow .g { font: 600 12px var(--font-mono); text-align: center; background: var(--accent-soft); color: var(--accent-strong); border-radius: 4px; }
+  .bs-qrow .pct { text-align: right; color: var(--text-muted); font-family: var(--font-mono); }
+  .bs-qrow .t { position: relative; height: 14px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+  .bs-qrow .f { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 4px; }
+  .bs-qrow.low .f { background: var(--critical); }
+  .bs-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 16px; }
+  .bs-keygrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 6px; }
+  .bs-key { display: flex; justify-content: space-between; background: var(--surface-2); border-radius: 6px; padding: 5px 9px; font: 13px var(--font-mono); }
+  .bs-key b { color: var(--accent-strong); }
+  .bs-faixas { display: flex; flex-wrap: wrap; gap: 6px; }
+  .bs-faixas span { font-size: 12px; background: var(--surface-2); border-radius: 6px; padding: 3px 8px; }
+  .bs-card-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  /* janela de edição (prova / aluno) */
+  .bs-modal-bg { position: fixed; inset: 0; background: rgba(10, 16, 10, .5); z-index: 60; display: flex; align-items: flex-start; justify-content: center; padding: 32px 16px; overflow-y: auto; }
+  .bs-modal-bg[hidden] { display: none; }
+  .bs-modal { background: var(--surface); color: var(--text); border-radius: 12px; box-shadow: var(--shadow-lift); width: min(940px, 100%); display: grid; gap: 0; }
+  .bs-modal-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .bs-modal-head h2 { margin: 0; font-family: var(--font-display); font-size: 18px; }
+  .bs-modal-body { padding: 18px 20px; display: grid; gap: 18px; }
+  .bs-modal-foot { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; padding: 14px 20px; border-top: 1px solid var(--border); }
+  .bs-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; }
+  .bs-modal .form-field textarea { border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 7px; padding: 8px 10px; font: 13px var(--font-body); resize: vertical; }
+  .bs-qtable-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; max-height: 420px; overflow-y: auto; }
+  .bs-qtable { min-width: 640px; }
+  .bs-qtable td { padding: 5px 8px; cursor: default; }
+  .bs-qtable tbody tr:hover td { background: transparent; }
+  .bs-qtable input, .bs-qtable select { width: 100%; border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 6px; padding: 5px 7px; font: 13px var(--font-body); }
+  .bs-qtable .qn { font-family: var(--font-mono); font-weight: 600; width: 40px; }
+  .bs-faixa-row { display: grid; grid-template-columns: repeat(3, minmax(0, 110px)) auto; gap: 8px; align-items: end; }
+  .bs-faixa-row input { width: 100%; border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 6px; padding: 6px 8px; font: 13px var(--font-body); }
+  .bs-resp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 4px 18px; }
+  .bs-resp-row { display: flex; align-items: center; gap: 4px; font-size: 12.5px; }
+  .bs-resp-row .qn { font-family: var(--font-mono); font-weight: 600; width: 28px; }
+  .bs-resp-row button { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--surface); color: var(--text-muted); font: 600 11.5px var(--font-mono); cursor: pointer; padding: 0; }
+  .bs-resp-row button.on { background: var(--text); color: var(--surface); border-color: var(--text); }
+  .bs-resp-row button.dup { width: auto; border-radius: 6px; padding: 0 6px; }
+  .bs-resp-row button.dup.on { background: var(--critical); border-color: var(--critical); color: #fff; }
+  .bs-msg { font-size: 13px; }
+  .bs-msg.err { color: var(--critical); }
+  .bs-msg.ok { color: var(--success); }
+  @media (max-width: 640px) { .bs-dist { height: 140px; gap: 4px; } .bs-faixa-row { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 </style>
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
@@ -1159,6 +1288,14 @@
       </div>
     </div>
 
+    <div class="ano-switch">
+      <span class="ano-switch-label">Ano letivo</span>
+      <div class="ano-switch-row">
+        <select class="chip-select" id="ano-letivo-select"></select>
+        <button type="button" class="ano-add-btn" id="ano-add-turma-btn" title="Adicionar turma">+</button>
+      </div>
+    </div>
+
     <nav class="primary">
       <div>
         <div class="nav-label">Principal</div>
@@ -1185,6 +1322,10 @@
         <button class="nav-item" data-view="simulados">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
           Simulados
+        </button>
+        <button class="nav-item" data-view="bolsao">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.5 13.5 17 22l-5-3-5 3 1.5-8.5"/></svg>
+          Bolsão
         </button>
         <button class="nav-item" data-view="presencas">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="m9 16 2 2 4-4"/></svg>
@@ -1788,10 +1929,7 @@
                   <label class="conv-check"><input type="checkbox" id="lancarFaltou"> Aluno faltou neste simulado</label>
                 </div>
                 <label>Turma
-                  <select id="lancarTurma">
-                    <option value="Turma 1">Turma 1</option>
-                    <option value="Turma 2">Turma 2</option>
-                  </select>
+                  <select id="lancarTurma"></select>
                 </label>
                 <div id="lancarTopicos" class="lancar-topicos"></div>
                 <div class="lancar-form-actions">
@@ -1846,10 +1984,7 @@
                   <datalist id="omrStudentList"></datalist>
                 </label>
                 <label>Turma
-                  <select id="omrStudentTurma">
-                    <option value="Turma 1">Turma 1</option>
-                    <option value="Turma 2">Turma 2</option>
-                  </select>
+                  <select id="omrStudentTurma"></select>
                 </label>
                 <div class="omr-progress" id="omrReadSummary"></div>
                 <button class="btn btn-primary" id="omrConfirmSheet" type="button">Confirmar e ir para a próxima folha</button>
@@ -1886,8 +2021,6 @@
           <span class="sim-scope-label">Turma</span>
           <div class="seg" id="turmaFilter">
             <button data-t="all" class="active">Todas as turmas</button>
-            <button data-t="Turma 1">Pré-CEFET 1</button>
-            <button data-t="Turma 2">Pré-CEFET 2</button>
           </div>
           <div class="sim-scope-current" id="simScopeCurrent"></div>
         </div>
@@ -2070,6 +2203,190 @@
     </section>
 
     <!-- ---------------- FORM ---------------- -->
+    <!-- ---------------- BOLSÃO ---------------- -->
+    <section class="view" id="view-bolsao">
+      <div class="topbar">
+        <div>
+          <h1>Bolsão</h1>
+          <p id="bs-subtitulo">Prova de bolsas: correção, bolsa de cada aluno e conversas com as famílias</p>
+        </div>
+        <div class="bs-head-right">
+          <select class="chip-select" id="bs-edicao" aria-label="Edição do bolsão"></select>
+          <div class="tabs" role="tablist">
+            <button class="tab-btn active" data-bs-tab="res" type="button">Resultados</button>
+            <button class="tab-btn" data-bs-tab="dup" type="button">Marcações duplas</button>
+            <button class="tab-btn" data-bs-tab="conv" type="button">Conversas <span id="bs-conv-count"></span></button>
+            <button class="tab-btn" data-bs-tab="q" type="button">Por questão</button>
+            <button class="tab-btn" data-bs-tab="provas" type="button">Provas e gabaritos</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bs-aviso" id="bs-aviso" hidden></div>
+
+      <!-- Resultados -->
+      <div class="bs-sub" id="bs-res">
+        <div class="bs-stat-grid" id="bs-kpis"></div>
+        <div class="panel">
+          <div class="panel-head"><h2>Alunos por faixa de bolsa</h2></div>
+          <div class="bs-dist" id="bs-dist"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Classificação <span class="count-chip" id="bs-shown">0</span></h2>
+            <div class="filter-row">
+              <div class="bs-seg" id="bs-filtro-prova"></div>
+              <div class="search-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input type="text" id="bs-busca" placeholder="Buscar aluno…" aria-label="Buscar aluno">
+              </div>
+              <button class="btn btn-primary" id="bs-add-aluno" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                Adicionar aluno
+              </button>
+            </div>
+          </div>
+          <div class="bs-legend">
+            <span style="--c:var(--success-soft)">acertou</span>
+            <span style="--c:var(--critical-soft)">errou</span>
+            <span style="--c:var(--warning-soft)">em branco ou marcação dupla (conta como erro)</span>
+            <span>Clique no aluno para ver a análise e as respostas</span>
+          </div>
+          <div class="table-scroll">
+            <table class="bs-table">
+              <thead><tr>
+                <th class="num">#</th>
+                <th><button type="button" class="tab-btn" data-bs-sort="nome" style="padding:0">Aluno</button></th>
+                <th>Prova</th>
+                <th>Por área</th>
+                <th class="num"><button type="button" class="tab-btn" data-bs-sort="total" style="padding:0">Acertos ▼</button></th>
+                <th class="num">Bolsa</th>
+              </tr></thead>
+              <tbody id="bs-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Marcações duplas -->
+      <div class="bs-sub" id="bs-dup" hidden>
+        <p class="bs-note">Regra da coordenação: questão com duas alternativas marcadas ou deixada em branco conta como erro.</p>
+        <div class="bs-cards" id="bs-dup-cards"></div>
+        <div class="panel">
+          <div class="panel-head"><h2>Questões em branco</h2></div>
+          <ul class="bs-check" id="bs-brancos"></ul>
+        </div>
+      </div>
+
+      <!-- Conversas com os pais -->
+      <div class="bs-sub" id="bs-conv" hidden>
+        <p class="bs-note">Marque o aluno quando a conversa com a família for feita. Ele vai para “Conversas realizadas” com a data e uma observação. Todos que estiverem com o painel aberto veem a mudança na hora.</p>
+        <div class="panel">
+          <div class="panel-head">
+            <h2>A conversar <span class="count-chip" id="bs-pend-n">0</span></h2>
+            <div class="filter-row">
+              <div class="bs-seg" id="bs-conv-filtro"></div>
+              <div class="search-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input type="text" id="bs-conv-busca" placeholder="Buscar aluno…" aria-label="Buscar aluno pendente">
+              </div>
+            </div>
+          </div>
+          <ul class="bs-check" id="bs-pendentes"></ul>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Conversas realizadas <span class="count-chip" id="bs-feitas-n">0</span></h2></div>
+          <ul class="bs-check" id="bs-feitas"></ul>
+        </div>
+      </div>
+
+      <!-- Por questão -->
+      <div class="bs-sub" id="bs-q" hidden>
+        <p class="bs-note">Porcentagem de alunos que acertaram cada questão. Em vermelho, menos de 25% de acerto: vale o professor conferir o gabarito dessas questões.</p>
+        <div class="bs-two" id="bs-qcharts"></div>
+      </div>
+
+      <!-- Provas e gabaritos -->
+      <div class="bs-sub" id="bs-provas" hidden>
+        <div class="filter-row" style="justify-content:space-between">
+          <p class="bs-note">Cada prova tem seu gabarito, os assuntos de cada questão e a tabela de bolsa. Para um novo bolsão, crie as provas com o nome da nova edição (ex.: Bolsão 2028).</p>
+          <button class="btn btn-primary" id="bs-add-prova" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Nova prova
+          </button>
+        </div>
+        <div class="bs-cards" id="bs-prova-cards"></div>
+      </div>
+    </section>
+
+    <!-- janela: prova -->
+    <div class="bs-modal-bg" id="bs-prova-modal" hidden>
+      <form class="bs-modal" id="bs-prova-form" novalidate>
+        <div class="bs-modal-head"><h2 id="bs-prova-titulo">Nova prova</h2><button type="button" class="btn btn-ghost" data-bs-close>Fechar</button></div>
+        <div class="bs-modal-body">
+          <div class="bs-fields">
+            <div class="form-field"><label for="bp-edicao">Edição do bolsão</label><input id="bp-edicao" list="bp-edicoes" placeholder="Ex.: Bolsão 2028" required><datalist id="bp-edicoes"></datalist></div>
+            <div class="form-field"><label for="bp-nome">Nome da prova</label><input id="bp-nome" placeholder="Ex.: Prova do 9º Ano" required></div>
+            <div class="form-field"><label for="bp-data">Data de aplicação</label><input id="bp-data" type="date"></div>
+            <div class="form-field"><label for="bp-turmas">Turmas que fazem esta prova</label><input id="bp-turmas" placeholder="Ex.: CEFET/IFET/COLUNI, PISM"></div>
+            <div class="form-field"><label for="bp-n">Número de questões</label><input id="bp-n" type="number" min="1" max="120" value="30"></div>
+            <div class="form-field"><label for="bp-copiar">Copiar assuntos e tabela de bolsa de</label><select id="bp-copiar"><option value="">Não copiar</option></select></div>
+          </div>
+          <div>
+            <div class="bs-label" style="margin-bottom:6px">Gabarito e assunto de cada questão</div>
+            <p class="bs-note" style="margin-bottom:8px">O assunto agrupa as questões na análise de dificuldades de cada aluno. A área separa Português, Matemática ou outra matéria.</p>
+            <div class="bs-qtable-wrap"><table class="bs-qtable"><thead><tr><th>Q</th><th>Resposta</th><th>Área</th><th>Assunto</th><th>Conteúdo da questão</th></tr></thead><tbody id="bp-qbody"></tbody></table></div>
+            <datalist id="bp-areas"><option value="Português"><option value="Matemática"></datalist>
+            <datalist id="bp-assuntos"></datalist>
+          </div>
+          <div>
+            <div class="bs-label" style="margin-bottom:6px">Tabela de bolsa (por número de acertos)</div>
+            <div id="bp-faixas" style="display:grid;gap:8px"></div>
+            <button type="button" class="btn btn-ghost" id="bp-add-faixa" style="margin-top:8px">Adicionar faixa</button>
+          </div>
+        </div>
+        <div class="bs-modal-foot">
+          <span class="bs-msg" id="bp-msg"></span>
+          <div class="bs-card-actions">
+            <button type="button" class="btn btn-ghost" data-bs-close>Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="bp-salvar">Salvar prova</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- janela: aluno -->
+    <div class="bs-modal-bg" id="bs-aluno-modal" hidden>
+      <form class="bs-modal" id="bs-aluno-form" novalidate>
+        <div class="bs-modal-head"><h2 id="bs-aluno-titulo">Adicionar aluno</h2><button type="button" class="btn btn-ghost" data-bs-close>Fechar</button></div>
+        <div class="bs-modal-body">
+          <div class="bs-fields">
+            <div class="form-field"><label for="ba-nome">Nome do aluno</label><input id="ba-nome" required></div>
+            <div class="form-field"><label for="ba-prova">Prova que fez</label><select id="ba-prova"></select></div>
+            <div class="form-field"><label for="ba-turma">Turma marcada na folha</label><input id="ba-turma" list="ba-turmas"><datalist id="ba-turmas"></datalist></div>
+            <div class="form-field"><label for="ba-contato">Contato</label><input id="ba-contato" placeholder="(32) 9…"></div>
+            <div class="form-field"><label for="ba-fonte">Folha / página</label><input id="ba-fonte" placeholder="Ex.: Lote 1, pág. 3"></div>
+          </div>
+          <div class="form-field"><label for="ba-colar">Colar respostas (opcional)</label><input id="ba-colar" placeholder="Uma letra por questão. Use _ para branco e * para marcação dupla. Ex.: cbea_d*…" autocomplete="off"></div>
+          <div>
+            <div class="filter-row" style="justify-content:space-between;margin-bottom:8px"><div class="bs-label">Respostas marcadas</div><span class="bs-msg" id="ba-placar"></span></div>
+            <div class="bs-resp-grid" id="ba-resp"></div>
+          </div>
+          <div class="form-field"><label for="ba-obs">Observações</label><textarea id="ba-obs" rows="2"></textarea></div>
+        </div>
+        <div class="bs-modal-foot">
+          <div class="bs-card-actions">
+            <button type="button" class="btn btn-danger" id="ba-excluir" hidden>Excluir aluno</button>
+            <span class="bs-msg" id="ba-msg"></span>
+          </div>
+          <div class="bs-card-actions">
+            <button type="button" class="btn btn-ghost" data-bs-close>Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="ba-salvar">Salvar aluno</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
     <section class="view" id="view-form">
       <div class="topbar">
         <div>
@@ -2094,7 +2411,7 @@
               Turma da matrícula
             </div>
             <div class="form-fields">
-              <div class="form-field"><label>Turma em 2026</label>
+              <div class="form-field"><label id="f-turma-label">Turma em 2026</label>
                 <select id="f-turma"></select>
               </div>
               <div class="form-field"><label>Data da matrícula</label><input type="date" id="f-data-matricula"></div>
@@ -2260,6 +2577,566 @@ function ensurePdfJsLoaded() {
 }
 </script>
 <script>
+/* ===================== BOLSÃO (prova de bolsas) =====================
+   Tabelas no Supabase: bolsao_provas (gabarito, assuntos, tabela de bolsa) e
+   bolsao_alunos (respostas + conversa com a família). As duas estão no realtime:
+   qualquer mudança feita em um computador aparece nos outros na hora.
+   Respostas: a-e = alternativa marcada, _ = em branco, * = marcação dupla (conta como erro). */
+
+const BS_FAIXAS_PADRAO = [
+  {min:0,max:12,bolsa:10},{min:13,max:14,bolsa:20},{min:15,max:16,bolsa:30},{min:17,max:19,bolsa:40},
+  {min:20,max:25,bolsa:50},{min:26,max:28,bolsa:60},{min:29,max:29,bolsa:80},{min:30,max:30,bolsa:100}];
+
+const bs = {
+  provas: [], alunos: [], edicao: null,
+  aba: 'res', filtroProva: 'all', busca: '', sortKey: 'total', sortDir: -1, aberto: null,
+  convFiltro: 'all', convBusca: '', canal: null, iniciado: false,
+  editProva: null, editAluno: null, respostas: [], confirmExcluir: null
+};
+const bsEl = id => document.getElementById(id);
+const bsNorm = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const bsHoje = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+const bsData = iso => { if (!iso) return ''; const [y,m,d] = iso.split('-'); return `${d}/${m}/${y}`; };
+const bsQ = n => String(n).padStart(2, '0');
+
+function bsAviso(msg){ const el = bsEl('bs-aviso'); el.textContent = msg || ''; el.hidden = !msg; }
+
+/* ---------- cálculo ---------- */
+function bsProva(id){ return bs.provas.find(p => p.id === id); }
+function bsTema(prova, q){
+  const t = (prova.temas || []).find(x => Number(x.q) === q) || {};
+  return { area: t.area || 'Geral', assunto: t.assunto || 'Sem assunto definido', conteudo: t.conteudo || '' };
+}
+function bsBolsa(prova, acertos){
+  const f = (prova.tabela_bolsa || []).find(f => acertos >= f.min && acertos <= f.max);
+  return f ? Number(f.bolsa) : 0;
+}
+function bsCorrigir(a){
+  const p = bsProva(a.prova_id);
+  if (!p) return null;
+  const g = p.gabarito, n = g.length, marks = [], porArea = {};
+  let total = 0;
+  for (let i = 0; i < n; i++){
+    const r = (a.respostas || '')[i] || '_';
+    const ok = r === g[i];
+    const area = bsTema(p, i + 1).area;
+    porArea[area] = porArea[area] || {ok: 0, n: 0};
+    porArea[area].n++;
+    if (ok){ total++; porArea[area].ok++; }
+    marks.push({ r, ok, vazio: !/[a-e]/.test(r), dupla: r === '*', branco: r === '_' });
+  }
+  return { prova: p, n, total, porArea, marks, bolsa: bsBolsa(p, total),
+           duplas: marks.filter(m => m.dupla).length, brancos: marks.filter(m => m.branco).length };
+}
+function bsAlunosDaEdicao(){
+  const ids = new Set(bs.provas.filter(p => p.edicao === bs.edicao).map(p => p.id));
+  const lista = bs.alunos.filter(a => ids.has(a.prova_id)).map(a => ({ ...a, c: bsCorrigir(a) })).filter(a => a.c);
+  lista.sort((x, y) => (y.c.total / y.c.n) - (x.c.total / x.c.n) || y.c.total - x.c.total || x.nome.localeCompare(y.nome, 'pt'));
+  lista.forEach((a, i) => a.pos = i + 1);
+  return lista;
+}
+function bsProvasDaEdicao(){ return bs.provas.filter(p => p.edicao === bs.edicao).sort((a, b) => a.nome.localeCompare(b.nome, 'pt')); }
+function bsBolsaTag(b){ const cls = b <= 10 ? 'b1' : b >= 80 ? 'b4' : b >= 40 ? 'b3' : ''; return `<span class="bs-bolsa ${cls}">${b}%</span>`; }
+function bsAbrevArea(a){ return a === 'Português' ? 'Port.' : a === 'Matemática' ? 'Mat.' : a; }
+
+/* ---------- carregar e sincronizar ---------- */
+async function bsCarregar(){
+  const [rp, ra] = await Promise.all([
+    supabase.from('bolsao_provas').select('*').order('created_at'),
+    supabase.from('bolsao_alunos').select('*').order('created_at')
+  ]);
+  if (rp.error || ra.error){
+    console.error('Erro ao carregar o Bolsão:', rp.error || ra.error);
+    bsAviso('Não foi possível carregar os dados do Bolsão. Verifique a internet e recarregue a página.');
+    return;
+  }
+  bs.provas = rp.data || [];
+  bs.alunos = ra.data || [];
+  const edicoes = [...new Set(bs.provas.map(p => p.edicao))].sort().reverse();
+  if (!edicoes.includes(bs.edicao)){
+    let salva = null; try { salva = localStorage.getItem('percurso_bolsao_edicao'); } catch(e){}
+    bs.edicao = edicoes.includes(salva) ? salva : (edicoes[0] || null);
+  }
+  bsAviso('');
+  bsRenderTudo();
+}
+function bsAssinar(){
+  if (bs.canal) return;
+  let timer = null;
+  const recarregar = () => { clearTimeout(timer); timer = setTimeout(bsCarregar, 250); };
+  bs.canal = supabase.channel('bolsao_sync')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'bolsao_alunos' }, payload => {
+      if (payload.eventType === 'DELETE'){
+        bs.alunos = bs.alunos.filter(a => a.id !== payload.old.id);
+      } else {
+        const i = bs.alunos.findIndex(a => a.id === payload.new.id);
+        if (i === -1) bs.alunos.push(payload.new); else bs.alunos[i] = payload.new;
+      }
+      bsRenderTudo(true);
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'bolsao_provas' }, recarregar)
+    .subscribe();
+}
+async function initBolsao(){
+  if (!bs.iniciado){ bs.iniciado = true; bsLigarEventos(); }
+  await bsCarregar();
+  bsAssinar();
+}
+
+/* ---------- render geral ---------- */
+function bsRenderTudo(deFora){
+  const sel = bsEl('bs-edicao');
+  const edicoes = [...new Set(bs.provas.map(p => p.edicao))].sort().reverse();
+  sel.innerHTML = edicoes.length ? edicoes.map(e => `<option value="${esc(e)}" ${e === bs.edicao ? 'selected' : ''}>${esc(e)}</option>`).join('') : '<option value="">Nenhuma prova cadastrada</option>';
+  const provas = bsProvasDaEdicao();
+  if (bs.filtroProva !== 'all' && !provas.some(p => p.id === bs.filtroProva)) bs.filtroProva = 'all';
+  if (bs.convFiltro !== 'all' && !provas.some(p => p.id === bs.convFiltro)) bs.convFiltro = 'all';
+  const seg = (alvo, atual) => `<button type="button" data-v="all" class="${atual === 'all' ? 'active' : ''}">Todas</button>` +
+    provas.map(p => `<button type="button" data-v="${p.id}" class="${atual === p.id ? 'active' : ''}">${esc(p.nome.replace(/^Prova d[oa] /, ''))}</button>`).join('');
+  bsEl('bs-filtro-prova').innerHTML = seg('res', bs.filtroProva);
+  bsEl('bs-conv-filtro').innerHTML = seg('conv', bs.convFiltro);
+  const lista = bsAlunosDaEdicao();
+  bsEl('bs-conv-count').textContent = lista.length ? `${lista.filter(a => a.conversa_feita).length}/${lista.length}` : '';
+  bsRenderResultados(lista);
+  bsRenderDuplas(lista);
+  // não redesenha a lista de conversas enquanto alguém digita uma observação nela
+  const ativo = document.activeElement;
+  if (!(deFora && ativo && ativo.matches && ativo.matches('#bs-feitas textarea'))) bsRenderConversas(lista);
+  bsRenderQuestoes(lista);
+  bsRenderProvas(lista);
+}
+
+/* ---------- Resultados ---------- */
+function bsRenderResultados(lista){
+  const provas = bsProvasDaEdicao();
+  const media = lista.length ? (lista.reduce((s, a) => s + a.c.total, 0) / lista.length).toFixed(1).replace('.', ',') : '—';
+  const acima = lista.filter(a => a.c.bolsa > Math.min(...lista.map(x => x.c.bolsa))).length;
+  bsEl('bs-kpis').innerHTML = [
+    ['Alunos corrigidos', lista.length, provas.map(p => `${esc(p.nome.replace(/^Prova d[oa] /, ''))}: ${lista.filter(a => a.prova_id === p.id).length}`).join(' · ') || '—'],
+    ['Média de acertos', media, provas.length === 1 ? `de ${provas[0].gabarito.length} questões` : 'em todas as provas'],
+    ['Acima da bolsa mínima', lista.length ? acima : '—', 'alunos'],
+    ['Conversas feitas', lista.length ? `${lista.filter(a => a.conversa_feita).length}/${lista.length}` : '—', 'com as famílias']
+  ].map(([l, v, s]) => `<div class="stat-card"><div class="stat-top"><span class="stat-label">${l}</span></div><div class="stat-value">${v}</div><div class="stat-sub">${s}</div></div>`).join('');
+
+  const valores = [...new Set(provas.flatMap(p => (p.tabela_bolsa || []).map(f => Number(f.bolsa))))].sort((a, b) => a - b);
+  const cont = valores.map(v => lista.filter(a => a.c.bolsa === v).length);
+  const max = Math.max(1, ...cont);
+  const faixaTxt = v => { const f = (provas[0]?.tabela_bolsa || []).find(f => Number(f.bolsa) === v); return f ? (f.min === f.max ? `${f.min}` : `${f.min}–${f.max}`) : ''; };
+  bsEl('bs-dist').innerHTML = valores.length ? valores.map((v, i) => `<div class="col" title="${cont[i]} alunos com bolsa de ${v}%">
+      <span class="n">${cont[i]}</span><div class="bar" style="height:${Math.max(2, cont[i] / max * 100)}%;opacity:${0.35 + 0.65 * (i + 1) / valores.length}"></div>
+      <span class="lbl">${v}%</span><span class="rng">${faixaTxt(v)}</span></div>`).join('') : '<div class="empty-note">Cadastre uma prova com a tabela de bolsa.</div>';
+
+  let rows = lista.filter(a => (bs.filtroProva === 'all' || a.prova_id === bs.filtroProva) && (!bs.busca || bsNorm(a.nome).includes(bs.busca)));
+  rows = rows.slice().sort((x, y) => bs.sortKey === 'nome' ? bs.sortDir * x.nome.localeCompare(y.nome, 'pt') : bs.sortDir * (x.pos - y.pos) * -1);
+  bsEl('bs-shown').textContent = rows.length;
+  bsEl('bs-tbody').innerHTML = rows.map(a => {
+    const flags = (a.c.duplas ? `<span class="bs-flag">marcou duas</span>` : '') + (a.c.brancos ? `<span class="bs-flag soft">${a.c.brancos} em branco</span>` : '') + (a.conversa_feita ? `<span class="bs-flag done">conversa feita</span>` : '');
+    const areas = Object.entries(a.c.porArea).map(([k, v]) => `${bsAbrevArea(k)} ${v.ok}/${v.n}`).join(' · ');
+    const linha = `<tr data-bs-id="${a.id}" tabindex="0" aria-expanded="${bs.aberto === a.id}">
+      <td class="num pos">${a.pos}º</td>
+      <td><span class="nome">${esc(a.nome)}</span>${flags}<div class="p-sub" style="font-size:11.5px;color:var(--text-faint)">${esc(a.turma_marcada || 'Turma não marcada')}</div></td>
+      <td><span class="bs-prova-tag">${esc(a.c.prova.nome.replace(/^Prova d[oa] /, ''))}</span></td>
+      <td class="areas">${areas}</td>
+      <td class="num bs-total">${a.c.total}</td>
+      <td class="num">${bsBolsaTag(a.c.bolsa)}</td></tr>`;
+    return linha + (bs.aberto === a.id ? `<tr class="bs-detail"><td colspan="6">${bsDetalhe(a, lista)}</td></tr>` : '');
+  }).join('') || `<tr><td colspan="6"><div class="empty-note">${lista.length ? 'Nenhum aluno encontrado.' : 'Nenhum aluno cadastrado nesta edição. Use “Adicionar aluno”.'}</div></td></tr>`;
+}
+
+function bsDetalhe(a, lista){
+  const p = a.c.prova;
+  const colegas = lista.filter(x => x.prova_id === p.id);
+  // agrupa as questões por assunto
+  const grupos = {};
+  for (let q = 1; q <= a.c.n; q++){
+    const t = bsTema(p, q);
+    const k = t.area + '|' + t.assunto;
+    grupos[k] = grupos[k] || { area: t.area, nome: t.assunto, qs: [] };
+    grupos[k].qs.push({ q, conteudo: t.conteudo });
+  }
+  const temas = Object.values(grupos).map(g => {
+    const ok = g.qs.filter(x => a.c.marks[x.q - 1].ok).length;
+    const okTurma = colegas.reduce((s, c) => s + g.qs.filter(x => c.c.marks[x.q - 1].ok).length, 0);
+    return { ...g, ok, n: g.qs.length, pct: Math.round(ok / g.qs.length * 100),
+             mediaPct: colegas.length ? Math.round(okTurma / (colegas.length * g.qs.length) * 100) : 0,
+             erradas: g.qs.filter(x => !a.c.marks[x.q - 1].ok) };
+  });
+  const fracos = temas.filter(t => t.erradas.length && t.pct < 50).sort((x, y) => x.pct - y.pct || y.n - x.n);
+  const fortes = temas.filter(t => t.pct >= 67 && t.n >= 2).sort((x, y) => y.pct - x.pct || y.n - x.n);
+  const lst = arr => arr.map(t => `<b>${esc(t.nome)}</b> (${t.ok} de ${t.n})`).join(', ').replace(/, ([^,]*)$/, ' e $1');
+  const areas = Object.entries(a.c.porArea);
+  let frase = '';
+  if (areas.length === 2){
+    const [[n1, v1], [n2, v2]] = areas, p1 = v1.ok / v1.n, p2 = v2.ok / v2.n;
+    frase = Math.abs(p1 - p2) >= 0.15 ? `Foi melhor em ${p1 > p2 ? n1 : n2} (${p1 > p2 ? v1.ok + '/' + v1.n : v2.ok + '/' + v2.n}) do que em ${p1 > p2 ? n2 : n1} (${p1 > p2 ? v2.ok + '/' + v2.n : v1.ok + '/' + v1.n}).`
+      : `Desempenho parecido em ${n1} (${v1.ok}/${v1.n}) e ${n2} (${v2.ok}/${v2.n}).`;
+  } else frase = `Acertou ${a.c.total} de ${a.c.n} questões.`;
+  if (fracos.length) frase += ` Maiores dificuldades: ${lst(fracos.slice(0, 3))}.`;
+  if (fortes.length) frase += ` Pontos fortes: ${lst(fortes.slice(0, 2))}.`;
+  if (!fracos.length && !fortes.length) frase += ' Os erros estão espalhados entre os assuntos, sem um ponto fraco concentrado.';
+
+  const linhaTema = t => {
+    const cor = t.pct >= 67 ? 'var(--success)' : t.pct >= 34 ? 'var(--warning)' : 'var(--critical)';
+    const err = t.erradas.length ? 'Errou: ' + t.erradas.map(x => `Q${bsQ(x.q)}${x.conteudo ? ' ' + esc(x.conteudo) : ''}${a.c.marks[x.q - 1].vazio ? (a.c.marks[x.q - 1].dupla ? ' (dupla)' : ' (em branco)') : ''}`).join(' · ') : 'Acertou todas';
+    return `<div class="bs-tema"><div class="bs-tema-top"><span>${esc(t.nome)}</span><b>${t.ok}/${t.n}</b></div>
+      <div class="bs-track" title="Média de quem fez esta prova: ${t.mediaPct}%"><div class="bs-fill" style="width:${Math.max(t.pct, 2)}%;background:${cor}"></div><span class="bs-media" style="left:${t.mediaPct}%"></span></div>
+      <div class="bs-tema-err">${err}</div></div>`;
+  };
+  const nomesArea = [...new Set(temas.map(t => t.area))];
+  const blocos = nomesArea.map(ar => `<div class="bs-area"><div class="bs-label">${esc(ar)}</div>${temas.filter(t => t.area === ar).map(linhaTema).join('')}</div>`).join('');
+
+  const g = p.gabarito;
+  const cell = (m, i) => { const cls = m.vazio ? 'nx' : m.ok ? 'ok' : 'no'; const s = m.branco ? '–' : m.dupla ? '2×' : m.r.toUpperCase();
+    return `<div class="bs-q ${cls}" title="Q${i + 1} (${esc(bsTema(p, i + 1).conteudo || bsTema(p, i + 1).assunto)}): marcou ${s}, gabarito ${g[i].toUpperCase()}"><i>${bsQ(i + 1)}</i>${s}</div>`; };
+  const conv = a.conversa_feita
+    ? `<span>Conversa com a família realizada em <b>${bsData(a.conversa_data)}</b>${a.conversa_obs ? ': ' + esc(a.conversa_obs) : '.'}</span><button type="button" class="btn btn-ghost" data-bs-conv-off="${a.id}">Desmarcar conversa</button>`
+    : `<span>Conversa com a família ainda não realizada.</span><button type="button" class="btn btn-primary" data-bs-conv-on="${a.id}">Marcar conversa como realizada</button>`;
+  return `<div class="bs-detail-body">
+    <div class="bs-conv-box">${conv}</div>
+    <p class="bs-resumo">${frase}</p>
+    <div class="bs-areas">${blocos}</div>
+    <p class="bs-note">A barra mostra o aproveitamento do aluno em cada assunto; o traço vertical marca a média de todos que fizeram a ${esc(p.nome.replace(/^Prova /, 'prova '))}.</p>
+    <div class="bs-label">Respostas marcadas</div>
+    <div class="table-scroll"><div class="bs-grid">${a.c.marks.map(cell).join('')}</div></div>
+    <div class="filter-row" style="justify-content:space-between"><span class="bs-note">Folha: ${esc(a.fonte || '—')}${a.contato ? ' · Contato: ' + esc(a.contato) : ''}${a.observacoes ? ' · ' + esc(a.observacoes) : ''}</span>
+      <button type="button" class="btn btn-ghost" data-bs-edit-aluno="${a.id}">Editar aluno e respostas</button></div>
+  </div>`;
+}
+
+/* ---------- Marcações duplas e brancos ---------- */
+function bsRenderDuplas(lista){
+  const comDupla = lista.filter(a => a.c.duplas);
+  bsEl('bs-dup-cards').innerHTML = comDupla.map(a => {
+    const qs = a.c.marks.map((m, i) => ({ m, q: i + 1 })).filter(x => x.m.dupla);
+    return `<article class="bs-card alerta"><div><h3>${esc(a.nome)}</h3><div class="meta">${esc(a.c.prova.nome)} · ${esc(a.fonte || '')}</div></div>
+      <div class="bs-dq">${qs.map(x => `<b>Q${bsQ(x.q)}</b><span>marcou duas alternativas · gabarito ${a.c.prova.gabarito[x.q - 1].toUpperCase()}</span>`).join('')}</div>
+      <div class="bs-conv-box" style="padding:8px 12px">${qs.length === 1 ? 'A questão conta' : 'As ' + qs.length + ' questões contam'} como erro. Total: <b>${a.c.total} acertos (${a.c.bolsa}%)</b></div></article>`;
+  }).join('') || '<div class="empty-note">Nenhum aluno marcou duas alternativas nesta edição.</div>';
+  const brancos = lista.filter(a => a.c.brancos);
+  bsEl('bs-brancos').innerHTML = brancos.map(a => `<li><span><b>${esc(a.nome)}</b> <span class="info">· ${esc(a.c.prova.nome)}</span></span><span class="info">${a.c.marks.map((m, i) => m.branco ? 'Q' + bsQ(i + 1) : '').filter(Boolean).join(', ')}</span></li>`).join('')
+    || '<li><span class="vazio">Nenhuma questão em branco nesta edição.</span></li>';
+}
+
+/* ---------- Conversas ---------- */
+function bsRenderConversas(lista){
+  const feitas = lista.filter(a => a.conversa_feita).sort((x, y) => (y.conversa_data || '').localeCompare(x.conversa_data || '') || x.nome.localeCompare(y.nome, 'pt'));
+  const pend = lista.filter(a => !a.conversa_feita && (bs.convFiltro === 'all' || a.prova_id === bs.convFiltro) && (!bs.convBusca || bsNorm(a.nome).includes(bs.convBusca)));
+  const totalPend = lista.length - feitas.length;
+  bsEl('bs-pend-n').textContent = totalPend;
+  bsEl('bs-feitas-n').textContent = feitas.length;
+  const info = a => `<span class="info">${a.pos}º lugar · ${esc(a.c.prova.nome.replace(/^Prova /, 'prova '))} · ${a.c.total} acertos</span>`;
+  bsEl('bs-pendentes').innerHTML = pend.map(a => `<li>
+      <label for="bsc-${a.id}"><input type="checkbox" id="bsc-${a.id}" data-bs-conv-on="${a.id}"><span><b>${esc(a.nome)}</b><br>${info(a)}</span></label>
+      ${bsBolsaTag(a.c.bolsa)}</li>`).join('')
+    || `<li><span class="vazio">${totalPend ? 'Nenhum aluno pendente com esse filtro.' : 'Todas as conversas foram realizadas.'}</span></li>`;
+  bsEl('bs-feitas').innerHTML = feitas.map(a => `<li>
+      <div style="min-width:0"><b>${esc(a.nome)}</b><span class="data">${bsData(a.conversa_data)}</span><br>${info(a)} · bolsa ${a.c.bolsa}%
+        <textarea id="bso-${a.id}" data-bs-obs="${a.id}" rows="1" placeholder="Observação da conversa (opcional)">${esc(a.conversa_obs || '')}</textarea></div>
+      <button type="button" class="btn btn-ghost" data-bs-conv-off="${a.id}">Desmarcar</button></li>`).join('')
+    || '<li><span class="vazio">Nenhuma conversa registrada ainda. Marque um aluno na lista acima quando falar com a família dele.</span></li>';
+}
+async function bsSalvarAluno(id, campos, desfazer){
+  const { error } = await supabase.from('bolsao_alunos').update({ ...campos, updated_at: new Date().toISOString() }).eq('id', id);
+  if (error){
+    console.error('Erro ao salvar no Bolsão:', error);
+    if (desfazer) desfazer();
+    bsAviso('Não foi possível salvar agora. Verifique a internet e tente de novo.');
+    bsRenderTudo();
+    return false;
+  }
+  bsAviso('');
+  return true;
+}
+function bsConversa(id, feita){
+  const a = bs.alunos.find(x => x.id === id); if (!a) return;
+  const antes = { conversa_feita: a.conversa_feita, conversa_data: a.conversa_data, conversa_obs: a.conversa_obs };
+  const novo = feita ? { conversa_feita: true, conversa_data: bsHoje() } : { conversa_feita: false, conversa_data: null, conversa_obs: null };
+  Object.assign(a, novo); bsRenderTudo();
+  bsSalvarAluno(id, novo, () => Object.assign(a, antes));
+}
+
+/* ---------- Por questão ---------- */
+function bsRenderQuestoes(lista){
+  bsEl('bs-qcharts').innerHTML = bsProvasDaEdicao().map(p => {
+    const al = lista.filter(a => a.prova_id === p.id);
+    let areaAnt = null;
+    const linhas = [...p.gabarito].map((gq, i) => {
+      const t = bsTema(p, i + 1);
+      const pct = al.length ? Math.round(al.filter(a => a.c.marks[i].ok).length / al.length * 100) : 0;
+      const cab = t.area !== areaAnt ? `<div class="bs-label" style="margin-top:${areaAnt ? 8 : 0}px">${esc(t.area)}</div>` : '';
+      areaAnt = t.area;
+      return cab + `<div class="bs-qrow ${al.length && pct < 25 ? 'low' : ''}" title="${esc(t.conteudo || t.assunto)}"><b>Q${bsQ(i + 1)}</b><span class="g">${gq.toUpperCase()}</span><div class="t"><div class="f" style="width:${Math.max(pct, 1)}%"></div></div><span class="pct">${pct}%</span></div>`;
+    }).join('');
+    return `<div class="panel"><div class="panel-head"><h2>${esc(p.nome)} <span class="count-chip">${al.length} alunos</span></h2></div><div class="bs-qchart">${linhas}</div></div>`;
+  }).join('') || '<div class="empty-note">Nenhuma prova nesta edição.</div>';
+}
+
+/* ---------- Provas e gabaritos ---------- */
+function bsRenderProvas(lista){
+  bsEl('bs-prova-cards').innerHTML = bsProvasDaEdicao().map(p => {
+    const n = lista.filter(a => a.prova_id === p.id).length;
+    const conf = bs.confirmExcluir === p.id;
+    return `<article class="bs-card"><div><h3>${esc(p.nome)}</h3><div class="meta">${esc(p.edicao)}${p.data_aplicacao ? ' · aplicada em ' + bsData(p.data_aplicacao) : ''} · ${p.gabarito.length} questões · ${n} alunos${(p.turmas || []).length ? ' · turmas: ' + esc(p.turmas.join(', ')) : ''}</div></div>
+      <div class="bs-label">Gabarito</div>
+      <div class="bs-keygrid">${[...p.gabarito].map((g, i) => `<div class="bs-key"><span>${bsQ(i + 1)}</span><b>${g.toUpperCase()}</b></div>`).join('')}</div>
+      <div class="bs-label">Tabela de bolsa</div>
+      <div class="bs-faixas">${(p.tabela_bolsa || []).map(f => `<span>${f.min === f.max ? f.min : f.min + ' a ' + f.max} acertos: <b>${f.bolsa}%</b></span>`).join('') || '<span>Sem tabela</span>'}</div>
+      <div class="bs-card-actions">
+        <button type="button" class="btn btn-ghost" data-bs-edit-prova="${p.id}">Editar prova</button>
+        ${conf ? `<button type="button" class="btn btn-danger" data-bs-del-prova-ok="${p.id}">Confirmar: excluir prova e ${n} alunos</button><button type="button" class="btn btn-ghost" data-bs-del-prova-cancel>Cancelar</button>`
+               : `<button type="button" class="btn btn-danger" data-bs-del-prova="${p.id}">Excluir</button>`}
+      </div></article>`;
+  }).join('') || '<div class="empty-note">Nenhuma prova cadastrada. Use “Nova prova”.</div>';
+}
+
+/* ---------- janela da prova ---------- */
+function bsAbrirProva(id){
+  const p = id ? bsProva(id) : null;
+  bs.editProva = p ? p.id : null;
+  bsEl('bs-prova-titulo').textContent = p ? 'Editar prova' : 'Nova prova';
+  const edicoes = [...new Set(bs.provas.map(x => x.edicao))];
+  bsEl('bp-edicoes').innerHTML = edicoes.map(e => `<option value="${esc(e)}">`).join('');
+  bsEl('bp-edicao').value = p ? p.edicao : (bs.edicao || '');
+  bsEl('bp-nome').value = p ? p.nome : '';
+  bsEl('bp-data').value = p && p.data_aplicacao ? p.data_aplicacao : '';
+  bsEl('bp-turmas').value = p ? (p.turmas || []).join(', ') : '';
+  bsEl('bp-n').value = p ? p.gabarito.length : 30;
+  bsEl('bp-copiar').innerHTML = '<option value="">Não copiar</option>' + bs.provas.filter(x => !p || x.id !== p.id).map(x => `<option value="${x.id}">${esc(x.edicao)} · ${esc(x.nome)}</option>`).join('');
+  bsEl('bp-qbody').innerHTML = '';
+  bsMontarQuestoes(p ? p.gabarito.length : 30, p);
+  bsMontarFaixas(p ? p.tabela_bolsa : BS_FAIXAS_PADRAO);
+  bsEl('bp-msg').textContent = ''; bsEl('bp-msg').className = 'bs-msg';
+  bsEl('bs-prova-modal').hidden = false;
+  bsEl('bp-edicao').focus();
+}
+function bsLerQuestoes(){
+  return [...bsEl('bp-qbody').querySelectorAll('tr')].map((tr, i) => ({
+    q: i + 1, g: tr.querySelector('[data-k=g]').value,
+    area: tr.querySelector('[data-k=area]').value.trim(), assunto: tr.querySelector('[data-k=assunto]').value.trim(), conteudo: tr.querySelector('[data-k=conteudo]').value.trim() }));
+}
+function bsMontarQuestoes(n, fonte){
+  const atuais = bsEl('bp-qbody').children.length ? bsLerQuestoes() : [];
+  const linhas = [];
+  for (let q = 1; q <= n; q++){
+    const t = fonte ? bsTema(fonte, q) : null;
+    const prev = atuais[q - 1];
+    const g = fonte && fonte.gabarito && fonte.gabarito[q - 1] ? fonte.gabarito[q - 1] : (prev ? prev.g : '');
+    const area = t && t.area !== 'Geral' ? t.area : (prev ? prev.area : (q <= Math.ceil(n / 2) ? 'Português' : 'Matemática'));
+    const assunto = t && t.assunto !== 'Sem assunto definido' ? t.assunto : (prev ? prev.assunto : '');
+    const conteudo = t ? t.conteudo : (prev ? prev.conteudo : '');
+    linhas.push(`<tr><td class="qn">${bsQ(q)}</td>
+      <td><select data-k="g" aria-label="Resposta da questão ${q}"><option value="">—</option>${'abcde'.split('').map(l => `<option value="${l}" ${l === g ? 'selected' : ''}>${l.toUpperCase()}</option>`).join('')}</select></td>
+      <td><input data-k="area" list="bp-areas" value="${esc(area)}" aria-label="Área da questão ${q}"></td>
+      <td><input data-k="assunto" list="bp-assuntos" value="${esc(assunto)}" aria-label="Assunto da questão ${q}"></td>
+      <td><input data-k="conteudo" value="${esc(conteudo)}" aria-label="Conteúdo da questão ${q}"></td></tr>`);
+  }
+  bsEl('bp-qbody').innerHTML = linhas.join('');
+  const assuntos = [...new Set(bs.provas.flatMap(p => (p.temas || []).map(t => t.assunto)).filter(Boolean))];
+  bsEl('bp-assuntos').innerHTML = assuntos.map(a => `<option value="${esc(a)}">`).join('');
+}
+function bsMontarFaixas(faixas){
+  bsEl('bp-faixas').innerHTML = (faixas || []).map((f, i) => `<div class="bs-faixa-row">
+    <div class="form-field"><label>De (acertos)</label><input type="number" min="0" data-f="min" value="${f.min}"></div>
+    <div class="form-field"><label>Até (acertos)</label><input type="number" min="0" data-f="max" value="${f.max}"></div>
+    <div class="form-field"><label>Bolsa (%)</label><input type="number" min="0" max="100" data-f="bolsa" value="${f.bolsa}"></div>
+    <button type="button" class="btn btn-ghost" data-bp-del-faixa="${i}" aria-label="Remover faixa">Remover</button></div>`).join('');
+}
+function bsLerFaixas(){
+  return [...bsEl('bp-faixas').querySelectorAll('.bs-faixa-row')].map(r => ({
+    min: Number(r.querySelector('[data-f=min]').value), max: Number(r.querySelector('[data-f=max]').value), bolsa: Number(r.querySelector('[data-f=bolsa]').value) }));
+}
+async function bsSalvarProva(e){
+  e.preventDefault();
+  const msg = bsEl('bp-msg');
+  const qs = bsLerQuestoes();
+  const faixas = bsLerFaixas().sort((a, b) => a.min - b.min);
+  const dados = {
+    edicao: bsEl('bp-edicao').value.trim(), nome: bsEl('bp-nome').value.trim(),
+    data_aplicacao: bsEl('bp-data').value || null,
+    turmas: bsEl('bp-turmas').value.split(',').map(s => s.trim()).filter(Boolean),
+    gabarito: qs.map(x => x.g).join(''),
+    temas: qs.map(x => ({ q: x.q, area: x.area || 'Geral', assunto: x.assunto || 'Sem assunto definido', conteudo: x.conteudo })),
+    tabela_bolsa: faixas, updated_at: new Date().toISOString()
+  };
+  const faltando = qs.filter(x => !x.g).map(x => x.q);
+  let erro = '';
+  if (!dados.edicao) erro = 'Informe a edição do bolsão (ex.: Bolsão 2028).';
+  else if (!dados.nome) erro = 'Informe o nome da prova.';
+  else if (faltando.length) erro = `Escolha a resposta certa das questões ${faltando.slice(0, 8).join(', ')}${faltando.length > 8 ? '…' : ''}.`;
+  else if (faixas.some(f => isNaN(f.min) || isNaN(f.max) || isNaN(f.bolsa) || f.min > f.max)) erro = 'Revise a tabela de bolsa: cada faixa precisa de “de”, “até” e porcentagem.';
+  if (erro){ msg.textContent = erro; msg.className = 'bs-msg err'; return; }
+  const btn = bsEl('bp-salvar'); btn.disabled = true; btn.textContent = 'Salvando…';
+  const r = bs.editProva
+    ? await supabase.from('bolsao_provas').update(dados).eq('id', bs.editProva)
+    : await supabase.from('bolsao_provas').insert(dados);
+  btn.disabled = false; btn.textContent = 'Salvar prova';
+  if (r.error){ console.error(r.error); msg.textContent = 'Não foi possível salvar a prova. Verifique a internet e tente de novo.'; msg.className = 'bs-msg err'; return; }
+  bs.edicao = dados.edicao; try { localStorage.setItem('percurso_bolsao_edicao', bs.edicao); } catch(err){}
+  bsEl('bs-prova-modal').hidden = true;
+  await bsCarregar();
+}
+
+/* ---------- janela do aluno ---------- */
+function bsAbrirAluno(id){
+  const a = id ? bs.alunos.find(x => x.id === id) : null;
+  const provas = bsProvasDaEdicao();
+  if (!provas.length){ bsAviso('Cadastre uma prova nesta edição antes de adicionar alunos (aba “Provas e gabaritos”).'); return; }
+  bs.editAluno = a ? a.id : null;
+  bsEl('bs-aluno-titulo').textContent = a ? 'Editar aluno' : 'Adicionar aluno';
+  bsEl('ba-prova').innerHTML = provas.map(p => `<option value="${p.id}">${esc(p.nome)}</option>`).join('');
+  bsEl('ba-prova').value = a ? a.prova_id : (bs.filtroProva !== 'all' ? bs.filtroProva : provas[0].id);
+  bsEl('ba-nome').value = a ? a.nome : '';
+  bsEl('ba-turma').value = a ? (a.turma_marcada || '') : '';
+  bsEl('ba-contato').value = a ? (a.contato || '') : '';
+  bsEl('ba-fonte').value = a ? (a.fonte || '') : '';
+  bsEl('ba-obs').value = a ? (a.observacoes || '') : '';
+  bsEl('ba-colar').value = '';
+  bs.respostas = a ? [...(a.respostas || '')] : [];
+  bsEl('ba-excluir').hidden = !a; bsEl('ba-excluir').textContent = 'Excluir aluno'; bs.confirmExcluirAluno = false;
+  bsEl('ba-msg').textContent = ''; bsEl('ba-msg').className = 'bs-msg';
+  bsMontarRespostas();
+  bsEl('bs-aluno-modal').hidden = false;
+  bsEl('ba-nome').focus();
+}
+function bsMontarRespostas(){
+  const p = bsProva(bsEl('ba-prova').value); if (!p) return;
+  const n = p.gabarito.length;
+  bs.respostas = Array.from({ length: n }, (_, i) => bs.respostas[i] || '_');
+  bsEl('ba-turmas').innerHTML = [...new Set([...(p.turmas || []), 'Não marcou'])].map(t => `<option value="${esc(t)}">`).join('');
+  bsEl('ba-resp').innerHTML = bs.respostas.map((r, i) => `<div class="bs-resp-row" data-q="${i}"><span class="qn">${bsQ(i + 1)}</span>
+    ${'abcde'.split('').map(l => `<button type="button" data-l="${l}" class="${r === l ? 'on' : ''}" aria-label="Questão ${i + 1}: ${l.toUpperCase()}" aria-pressed="${r === l}">${l.toUpperCase()}</button>`).join('')}
+    <button type="button" data-l="*" class="dup ${r === '*' ? 'on' : ''}" aria-label="Questão ${i + 1}: marcou duas" aria-pressed="${r === '*'}">2×</button></div>`).join('');
+  bsPlacar();
+}
+function bsPlacar(){
+  const p = bsProva(bsEl('ba-prova').value); if (!p) return;
+  const tot = bs.respostas.filter((r, i) => r === p.gabarito[i]).length;
+  const brancos = bs.respostas.filter(r => r === '_').length;
+  bsEl('ba-placar').innerHTML = `<b>${tot}</b> de ${p.gabarito.length} acertos · bolsa <b>${bsBolsa(p, tot)}%</b>${brancos ? ` · ${brancos} em branco` : ''}`;
+}
+async function bsSalvarAlunoForm(e){
+  e.preventDefault();
+  const msg = bsEl('ba-msg');
+  const dados = {
+    nome: bsEl('ba-nome').value.trim(), prova_id: bsEl('ba-prova').value,
+    turma_marcada: bsEl('ba-turma').value.trim() || null, contato: bsEl('ba-contato').value.trim() || null,
+    fonte: bsEl('ba-fonte').value.trim() || null, observacoes: bsEl('ba-obs').value.trim() || null,
+    respostas: bs.respostas.join(''), updated_at: new Date().toISOString()
+  };
+  if (!dados.nome){ msg.textContent = 'Informe o nome do aluno.'; msg.className = 'bs-msg err'; return; }
+  const btn = bsEl('ba-salvar'); btn.disabled = true; btn.textContent = 'Salvando…';
+  const r = bs.editAluno
+    ? await supabase.from('bolsao_alunos').update(dados).eq('id', bs.editAluno).select().single()
+    : await supabase.from('bolsao_alunos').insert(dados).select().single();
+  btn.disabled = false; btn.textContent = 'Salvar aluno';
+  if (r.error){ console.error(r.error); msg.textContent = 'Não foi possível salvar o aluno. Verifique a internet e tente de novo.'; msg.className = 'bs-msg err'; return; }
+  const i = bs.alunos.findIndex(x => x.id === r.data.id);
+  if (i === -1) bs.alunos.push(r.data); else bs.alunos[i] = r.data;
+  bs.aberto = r.data.id;
+  bsEl('bs-aluno-modal').hidden = true;
+  bsRenderTudo();
+}
+async function bsExcluirAluno(){
+  const b = bsEl('ba-excluir');
+  if (!bs.confirmExcluirAluno){ bs.confirmExcluirAluno = true; b.textContent = 'Clique de novo para confirmar a exclusão'; return; }
+  const { error } = await supabase.from('bolsao_alunos').delete().eq('id', bs.editAluno);
+  if (error){ console.error(error); bsEl('ba-msg').textContent = 'Não foi possível excluir. Tente de novo.'; bsEl('ba-msg').className = 'bs-msg err'; return; }
+  bs.alunos = bs.alunos.filter(x => x.id !== bs.editAluno);
+  bsEl('bs-aluno-modal').hidden = true;
+  bsRenderTudo();
+}
+
+/* ---------- eventos ---------- */
+function bsLigarEventos(){
+  document.querySelectorAll('[data-bs-tab]').forEach(b => b.addEventListener('click', () => {
+    bs.aba = b.dataset.bsTab;
+    document.querySelectorAll('[data-bs-tab]').forEach(x => x.classList.toggle('active', x === b));
+    ['res', 'dup', 'conv', 'q', 'provas'].forEach(k => bsEl('bs-' + k).hidden = k !== bs.aba);
+  }));
+  bsEl('bs-edicao').addEventListener('change', e => {
+    bs.edicao = e.target.value; bs.aberto = null; bs.filtroProva = 'all'; bs.convFiltro = 'all';
+    try { localStorage.setItem('percurso_bolsao_edicao', bs.edicao); } catch(err){}
+    bsRenderTudo();
+  });
+  bsEl('bs-filtro-prova').addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (b){ bs.filtroProva = b.dataset.v; bsRenderTudo(); } });
+  bsEl('bs-conv-filtro').addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (b){ bs.convFiltro = b.dataset.v; bsRenderTudo(); } });
+  bsEl('bs-busca').addEventListener('input', e => { bs.busca = bsNorm(e.target.value.trim()); bsRenderTudo(); });
+  bsEl('bs-conv-busca').addEventListener('input', e => { bs.convBusca = bsNorm(e.target.value.trim()); bsRenderTudo(); });
+  document.querySelectorAll('[data-bs-sort]').forEach(b => b.addEventListener('click', () => {
+    const k = b.dataset.bsSort;
+    if (bs.sortKey === k) bs.sortDir *= -1; else { bs.sortKey = k; bs.sortDir = k === 'nome' ? 1 : -1; }
+    document.querySelectorAll('[data-bs-sort]').forEach(x => x.textContent = x.textContent.replace(/ [▲▼]$/, ''));
+    b.textContent += bs.sortDir < 0 ? ' ▼' : ' ▲';
+    bsRenderTudo();
+  }));
+  const tbody = bsEl('bs-tbody');
+  const alternar = tr => { const id = tr.dataset.bsId; bs.aberto = bs.aberto === id ? null : id; bsRenderTudo(); const de = tbody.querySelector(`tr[data-bs-id="${id}"]`); if (de) de.focus(); };
+  tbody.addEventListener('click', e => {
+    const on = e.target.closest('[data-bs-conv-on]'), off = e.target.closest('[data-bs-conv-off]'), ed = e.target.closest('[data-bs-edit-aluno]');
+    if (on) return bsConversa(on.dataset.bsConvOn, true);
+    if (off) return bsConversa(off.dataset.bsConvOff, false);
+    if (ed) return bsAbrirAluno(ed.dataset.bsEditAluno);
+    const tr = e.target.closest('tr[data-bs-id]'); if (tr) alternar(tr);
+  });
+  tbody.addEventListener('keydown', e => { const tr = e.target.closest('tr[data-bs-id]'); if (tr && e.target === tr && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); alternar(tr); } });
+  bsEl('bs-pendentes').addEventListener('change', e => { const cb = e.target.closest('[data-bs-conv-on]'); if (cb && cb.checked) bsConversa(cb.dataset.bsConvOn, true); });
+  bsEl('bs-feitas').addEventListener('click', e => { const b = e.target.closest('[data-bs-conv-off]'); if (b) bsConversa(b.dataset.bsConvOff, false); });
+  bsEl('bs-feitas').addEventListener('change', e => {
+    const t = e.target.closest('[data-bs-obs]'); if (!t) return;
+    const a = bs.alunos.find(x => x.id === t.dataset.bsObs); const obs = t.value.trim();
+    if (!a || (a.conversa_obs || '') === obs) return;
+    const antes = a.conversa_obs; a.conversa_obs = obs || null;
+    bsSalvarAluno(a.id, { conversa_obs: obs || null }, () => { a.conversa_obs = antes; });
+  });
+  bsEl('bs-add-aluno').addEventListener('click', () => bsAbrirAluno(null));
+  bsEl('bs-add-prova').addEventListener('click', () => bsAbrirProva(null));
+  bsEl('bs-prova-cards').addEventListener('click', async e => {
+    const ed = e.target.closest('[data-bs-edit-prova]'), del = e.target.closest('[data-bs-del-prova]'),
+          ok = e.target.closest('[data-bs-del-prova-ok]'), cancel = e.target.closest('[data-bs-del-prova-cancel]');
+    if (ed) return bsAbrirProva(ed.dataset.bsEditProva);
+    if (del){ bs.confirmExcluir = del.dataset.bsDelProva; return bsRenderTudo(); }
+    if (cancel){ bs.confirmExcluir = null; return bsRenderTudo(); }
+    if (ok){
+      const { error } = await supabase.from('bolsao_provas').delete().eq('id', ok.dataset.bsDelProvaOk);
+      bs.confirmExcluir = null;
+      if (error){ console.error(error); bsAviso('Não foi possível excluir a prova. Tente de novo.'); }
+      await bsCarregar();
+    }
+  });
+  // janelas
+  document.querySelectorAll('.bs-modal-bg').forEach(bg => {
+    bg.addEventListener('click', e => { if (e.target === bg || e.target.closest('[data-bs-close]')) bg.hidden = true; });
+    bg.addEventListener('keydown', e => { if (e.key === 'Escape') bg.hidden = true; });
+  });
+  bsEl('bs-prova-form').addEventListener('submit', bsSalvarProva);
+  bsEl('bp-n').addEventListener('change', e => { const n = Math.max(1, Math.min(120, Number(e.target.value) || 30)); e.target.value = n; bsMontarQuestoes(n, null); });
+  bsEl('bp-copiar').addEventListener('change', e => {
+    const src = bsProva(e.target.value); if (!src) return;
+    // copia assuntos e tabela; as respostas já marcadas nesta prova continuam
+    const n = Number(bsEl('bp-n').value) || src.gabarito.length;
+    bsMontarQuestoes(n, { ...src, gabarito: '' });
+    bsMontarFaixas(src.tabela_bolsa);
+  });
+  bsEl('bp-add-faixa').addEventListener('click', () => { const f = bsLerFaixas(); const ult = f[f.length - 1]; f.push({ min: ult ? ult.max + 1 : 0, max: ult ? ult.max + 1 : 0, bolsa: 0 }); bsMontarFaixas(f); });
+  bsEl('bp-faixas').addEventListener('click', e => { const b = e.target.closest('[data-bp-del-faixa]'); if (b){ const f = bsLerFaixas(); f.splice(Number(b.dataset.bpDelFaixa), 1); bsMontarFaixas(f); } });
+  bsEl('bs-aluno-form').addEventListener('submit', bsSalvarAlunoForm);
+  bsEl('ba-prova').addEventListener('change', bsMontarRespostas);
+  bsEl('ba-resp').addEventListener('click', e => {
+    const b = e.target.closest('button[data-l]'); if (!b) return;
+    const i = Number(b.closest('[data-q]').dataset.q);
+    bs.respostas[i] = bs.respostas[i] === b.dataset.l ? '_' : b.dataset.l;
+    b.closest('[data-q]').querySelectorAll('button').forEach(x => { const on = bs.respostas[i] === x.dataset.l; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); });
+    bsPlacar();
+  });
+  bsEl('ba-colar').addEventListener('input', e => {
+    const s = e.target.value.toLowerCase().replace(/[^a-e_*?\-]/g, '').replace(/[?]/g, '*').replace(/-/g, '_');
+    if (!s) return;
+    bs.respostas = [...s]; bsMontarRespostas();
+  });
+  bsEl('ba-excluir').addEventListener('click', bsExcluirAluno);
+}
+</script>
+<script>
 /* ===================== conexão Supabase ===================== */
 const SUPABASE_URL = "https://fpsbujscwbrbsipbazmq.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZwc2J1anNjd2JyYnNpcGJhem1xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgyNzk4NDUsImV4cCI6MjEwMzg1NTg0NX0.5ISlQPJ2PG8G4612aBqjA_S7inr57kT2e0TqpPw4H_I";
@@ -2267,6 +3144,11 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let students = [];
 let turmasList = [];
+let allTurmasRaw = [];
+let allStudentsRaw = [];
+let anosDisponiveis = [];
+let selectedAnoLetivo = null;
+const ANO_LETIVO_KEY = 'percurso_ano_letivo';
 let presencas = [];
 let presencaSummaryByAluno = new Map();
 let professoresList = [];
@@ -2274,12 +3156,11 @@ let horarioTemplate = [];
 let horarioSemanal = [];
 let registrosAula = [];
 let horarioExecucao = [];
-let horTurmaAtual = "Cefet 1";
+let horTurmaAtual = null; // uuid de turmas.id
 let horSemanaAtual = null;
 let fichaProfessorAtual = null;
-let kanTurmaAtual = "Cefet 1";
+let kanTurmaAtual = null; // uuid de turmas.id
 let kanSemanaAtual = null;
-const HOR_TURMA_ORDER = ["Cefet 1", "Cefet 2", "8º ano", "Enem"];
 const HOR_DIA_ORDER = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
 let editingStudentId = null;
 let currentDrawerId = null;
@@ -2399,9 +3280,35 @@ function fmtDate(iso) {
 
 /* ===================== carregar dados reais ===================== */
 async function loadTurmas() {
-  const { data, error } = await supabase.from("turmas").select("id, nome").order("nome");
+  const { data, error } = await supabase.from("turmas").select("id, nome, tipo, ano_letivo").order("nome");
   if (error) throw error;
-  turmasList = [...data].sort((a, b) => TURMA_ORDER.indexOf(a.nome) - TURMA_ORDER.indexOf(b.nome));
+  allTurmasRaw = data;
+}
+
+function computeAnosDisponiveis() {
+  anosDisponiveis = [...new Set(allTurmasRaw.map(t => t.ano_letivo))].sort((a, b) => b - a);
+  if (!anosDisponiveis.length) anosDisponiveis = [new Date().getFullYear()];
+}
+
+/* Recalcula turmasList/students a partir do ano letivo selecionado.
+   Alunos sem turma (turmaId nulo) aparecem em qualquer ano — são pendência de cadastro, não de um ano específico. */
+function applyAnoLetivoFilter() {
+  turmasList = allTurmasRaw
+    .filter(t => t.ano_letivo === selectedAnoLetivo)
+    .sort((a, b) => TURMA_ORDER.indexOf(a.nome) - TURMA_ORDER.indexOf(b.nome));
+  const turmaIds = new Set(turmasList.map(t => t.id));
+  students = allStudentsRaw.filter(s => !s.turmaId || turmaIds.has(s.turmaId));
+}
+
+function renderAnoSwitch() {
+  const sel = document.getElementById("ano-letivo-select");
+  if (!sel) return;
+  sel.innerHTML = anosDisponiveis.map(a => `<option value="${a}">Turmas ${a}</option>`).join("");
+  sel.value = String(selectedAnoLetivo);
+  const turmaLabel = document.getElementById("f-turma-label");
+  if (turmaLabel) turmaLabel.textContent = `Turma em ${selectedAnoLetivo}`;
+  const subtitle = document.getElementById("form-subtitle");
+  if (subtitle) subtitle.textContent = `Mesmos campos do Requerimento de Matrícula em papel — turma de ${selectedAnoLetivo}`;
 }
 
 async function loadStudents() {
@@ -2418,7 +3325,7 @@ async function loadStudents() {
     .order("nome_completo");
   if (error) throw error;
 
-  students = data.map(a => {
+  allStudentsRaw = data.map(a => {
     const fin = Array.isArray(a.financeiro) ? a.financeiro[0] : a.financeiro;
     const resp = a.responsavel;
     return {
@@ -2687,11 +3594,76 @@ document.getElementById("mini-modal-cancel").addEventListener("click", closeMini
 document.getElementById("mini-modal-backdrop").addEventListener("click", (e) => { if (e.target.id === "mini-modal-backdrop") closeMiniModal(); });
 document.getElementById("mini-modal-save").addEventListener("click", () => { if (miniModalOnSave) miniModalOnSave(); });
 
+/* ---------------- seletor de ano letivo / adicionar turma ---------------- */
+async function onAnoLetivoChanged() {
+  applyAnoLetivoFilter();
+  renderAnoSwitch();
+  populateTurmaFilters();
+  renderAll(); // renderAll() já chama renderHorarios(), que se autocorrige pro ano selecionado
+  await initSimulados().catch(err => console.error("Erro ao recarregar simulados para o ano selecionado:", err));
+}
+
+document.getElementById("ano-letivo-select").addEventListener("change", async (e) => {
+  selectedAnoLetivo = Number(e.target.value);
+  localStorage.setItem(ANO_LETIVO_KEY, String(selectedAnoLetivo));
+  await onAnoLetivoChanged();
+});
+
+document.getElementById("ano-add-turma-btn").addEventListener("click", () => {
+  const bodyHtml = `
+    <div class="f-field"><label>Nome da turma</label><input type="text" id="nt-nome" placeholder="Ex: Pré-CEFET 1"></div>
+    <div class="f-field"><label>Tipo</label>
+      <select id="nt-tipo">
+        <option value="CEFET">CEFET</option>
+        <option value="8º ano">8º ano</option>
+        <option value="ENEM">ENEM</option>
+      </select>
+    </div>
+    <div class="f-field"><label>Ano letivo</label><input type="number" id="nt-ano" value="${selectedAnoLetivo + 1}" step="1"></div>
+    <div class="f-field"><label>Horário</label><input type="text" id="nt-horario" placeholder="Ex: Segunda à quinta"></div>
+  `;
+  openMiniModal("Adicionar turma", bodyHtml, async () => {
+    const nome = document.getElementById("nt-nome").value.trim();
+    const tipo = document.getElementById("nt-tipo").value;
+    const ano = parseInt(document.getElementById("nt-ano").value, 10);
+    const horario = document.getElementById("nt-horario").value.trim() || null;
+    if (!nome) { alert("Informe o nome da turma."); return; }
+    if (!ano) { alert("Informe um ano letivo válido."); return; }
+    const btn = document.getElementById("mini-modal-save");
+    btn.disabled = true;
+    try {
+      const { error } = await supabase.from("turmas").insert({ nome, tipo, ano_letivo: ano, horario });
+      if (error) throw error;
+      await loadTurmas();
+      computeAnosDisponiveis();
+      selectedAnoLetivo = ano;
+      localStorage.setItem(ANO_LETIVO_KEY, String(selectedAnoLetivo));
+      await onAnoLetivoChanged();
+      closeMiniModal();
+      alert("Turma adicionada com sucesso!");
+    } catch (err) {
+      console.error("Erro ao adicionar turma:", err);
+      alert("Erro ao adicionar turma: " + (err.message || err));
+    } finally {
+      btn.disabled = false;
+    }
+  });
+});
+
 /* ---------------- Grade de horários (editável, por semana) ---------------- */
+/* Escopo por ano letivo via turma_id de verdade (FK para turmas.id, que já carrega
+   ano_letivo) — não por nome de turma nem por data. turmasList já vem filtrada pelo
+   ano selecionado, então as abas mostram exatamente as turmas daquele ano. turma_nome
+   continua sendo gravado em cada linha só como legenda de exibição (kanban, conflitos,
+   editor de célula) — nunca é usado para decidir a quem/qual ano uma linha pertence. */
+function nomeDaTurma(turmaId) {
+  const t = turmasList.find(x => x.id === turmaId) || allTurmasRaw.find(x => x.id === turmaId);
+  return t ? t.nome : "—";
+}
+
 function renderHorTurmaTabs() {
-  const turmas = HOR_TURMA_ORDER.filter(t => horarioSemanal.some(r => r.turma_nome === t));
-  document.getElementById("hor-turma-tabs").innerHTML = turmas.map(t =>
-    `<button type="button" class="tab-btn ${t === horTurmaAtual ? "active" : ""}" data-hor-turma="${esc(t)}">${esc(t)}</button>`
+  document.getElementById("hor-turma-tabs").innerHTML = turmasList.map(t =>
+    `<button type="button" class="tab-btn ${t.id === horTurmaAtual ? "active" : ""}" data-hor-turma="${t.id}">${esc(t.nome)}</button>`
   ).join("");
   document.querySelectorAll("[data-hor-turma]").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -2705,11 +3677,11 @@ function renderHorTurmaTabs() {
   });
 }
 
-function horWeeksForTurma(turma) {
-  return [...new Set(horarioSemanal.filter(r => r.turma_nome === turma).map(r => r.semana_num))].sort((a, b) => a - b);
+function horWeeksForTurma(turmaId) {
+  return [...new Set(horarioSemanal.filter(r => r.turma_id === turmaId).map(r => r.semana_num))].sort((a, b) => a - b);
 }
-function horWeekRange(turma, semana) {
-  const dates = horarioSemanal.filter(r => r.turma_nome === turma && r.semana_num === semana).map(r => r.data).sort();
+function horWeekRange(turmaId, semana) {
+  const dates = horarioSemanal.filter(r => r.turma_id === turmaId && r.semana_num === semana).map(r => r.data).sort();
   return { min: dates[0], max: dates[dates.length - 1] };
 }
 function horDefaultSemana(turma) {
@@ -2753,26 +3725,58 @@ function addDaysIso(iso, days) {
   dt.setUTCDate(dt.getUTCDate() + days);
   return dt.toISOString().slice(0, 10);
 }
+function startOfWeekIso(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const day = d.getUTCDay(); // 0=domingo..6=sábado
+  d.setUTCDate(d.getUTCDate() + (day === 0 ? -6 : 1 - day)); // volta pra segunda-feira
+  return d.toISOString().slice(0, 10);
+}
 function renderHorNovaSemanaBtn() {
   const btn = document.getElementById("hor-nova-semana-btn");
-  const weeks = horWeeksForTurma(horTurmaAtual);
-  btn.disabled = weeks.length === 0;
+  // habilitado se a turma atual já tem semana, OU se existe uma turma com o MESMO NOME
+  // em outro ano com horário cadastrado (serve de modelo pra começar um ano novo do zero).
+  const nome = nomeDaTurma(horTurmaAtual);
+  const temModelo = horWeeksForTurma(horTurmaAtual).length > 0
+    || allTurmasRaw.some(t => t.nome === nome && t.id !== horTurmaAtual && horarioSemanal.some(r => r.turma_id === t.id));
+  btn.disabled = !temModelo;
 }
 document.getElementById("hor-nova-semana-btn").addEventListener("click", async () => {
-  const weeks = horWeeksForTurma(horTurmaAtual);
-  if (!weeks.length) { alert("Não há semana cadastrada para esta turma ainda."); return; }
-  const ultimaSemana = weeks[weeks.length - 1];
-  const rows = horarioSemanal.filter(r => r.turma_nome === horTurmaAtual && r.semana_num === ultimaSemana);
-  if (!rows.length) return;
-  const novaSemana = ultimaSemana + 1;
-  if (!confirm(`Criar a semana ${String(novaSemana).padStart(2, "0")} para ${horTurmaAtual}, duplicando a semana ${String(ultimaSemana).padStart(2, "0")}?`)) return;
+  const weeksAno = horWeeksForTurma(horTurmaAtual);
+  let baseRows, novaSemana, novaSegunda;
+  if (weeksAno.length) {
+    const ultimaSemana = weeksAno[weeksAno.length - 1];
+    baseRows = horarioSemanal.filter(r => r.turma_id === horTurmaAtual && r.semana_num === ultimaSemana);
+    novaSemana = ultimaSemana + 1;
+    novaSegunda = null; // usa a data de cada linha +7 dias
+  } else {
+    // esta turma (deste ano) ainda não tem nenhuma semana: usa como modelo a semana mais
+    // recente de uma turma com o MESMO NOME em outro ano, recomeçando a numeração em 1,
+    // ancorada na semana atual real.
+    const nome = nomeDaTurma(horTurmaAtual);
+    const turmaModeloId = allTurmasRaw
+      .filter(t => t.nome === nome && t.id !== horTurmaAtual && horarioSemanal.some(r => r.turma_id === t.id))
+      .sort((a, b) => b.ano_letivo - a.ano_letivo)[0]?.id;
+    if (!turmaModeloId) { alert("Não há nenhum horário cadastrado para uma turma com esse nome em nenhum ano."); return; }
+    const todasSemanas = [...new Set(horarioSemanal.filter(r => r.turma_id === turmaModeloId).map(r => r.semana_num))].sort((a, b) => a - b);
+    const semanaModelo = todasSemanas[todasSemanas.length - 1];
+    baseRows = horarioSemanal.filter(r => r.turma_id === turmaModeloId && r.semana_num === semanaModelo);
+    novaSemana = 1;
+    novaSegunda = startOfWeekIso(new Date());
+  }
+  if (!baseRows.length) return;
+  const nomeAtual = nomeDaTurma(horTurmaAtual);
+  const confirmMsg = weeksAno.length
+    ? `Criar a semana ${String(novaSemana).padStart(2, "0")} para ${nomeAtual}, duplicando a semana ${String(novaSemana - 1).padStart(2, "0")}?`
+    : `Criar a 1ª semana de ${selectedAnoLetivo} para ${nomeAtual}, usando como modelo o horário mais recente cadastrado?`;
+  if (!confirm(confirmMsg)) return;
   const btn = document.getElementById("hor-nova-semana-btn");
   btn.disabled = true;
   try {
-    const novasLinhas = rows.map(r => ({
-      turma_nome: r.turma_nome,
+    const novasLinhas = baseRows.map(r => ({
+      turma_id: horTurmaAtual,
+      turma_nome: nomeAtual,
       semana_num: novaSemana,
-      data: addDaysIso(r.data, 7),
+      data: novaSegunda ? addDaysIso(novaSegunda, HOR_DIA_ORDER.indexOf(r.dia_semana)) : addDaysIso(r.data, 7),
       dia_semana: r.dia_semana,
       periodo_ordem: r.periodo_ordem,
       periodo_label: r.periodo_label,
@@ -2808,8 +3812,8 @@ function renderHorCellTd(cell) {
 }
 
 function renderHorGrid() {
-  const rows = horarioSemanal.filter(r => r.turma_nome === horTurmaAtual && r.semana_num === horSemanaAtual);
-  document.getElementById("hor-turma-count").textContent = horTurmaAtual || "—";
+  const rows = horarioSemanal.filter(r => r.turma_id === horTurmaAtual && r.semana_num === horSemanaAtual);
+  document.getElementById("hor-turma-count").textContent = nomeDaTurma(horTurmaAtual);
   if (!rows.length) {
     document.getElementById("hor-grade-table").innerHTML = `<tbody><tr><td style="padding:24px; text-align:center; color:var(--text-faint);">Nenhum dado para esta semana.</td></tr></tbody>`;
     return;
@@ -2876,8 +3880,11 @@ function mesLabel(mesStr) {
   return `${MESES_PT[parseInt(m, 10) - 1]} de ${y}`;
 }
 function allMonthsDesc() {
-  const set = new Set(registrosAula.map(r => r.mes_referencia).filter(Boolean));
-  set.add(mesTodayStr());
+  // mes_referencia já é "AAAA-MM", então o ano é derivado dele — sem precisar de coluna extra.
+  const prefixo = String(selectedAnoLetivo) + "-";
+  const set = new Set(registrosAula.map(r => r.mes_referencia).filter(m => m && m.startsWith(prefixo)));
+  if (selectedAnoLetivo === new Date().getFullYear()) set.add(mesTodayStr());
+  if (!set.size) set.add(`${selectedAnoLetivo}-01`); // ano novo sem nenhum lançamento ainda
   return [...set].sort().reverse();
 }
 function fichaResumoMes() {
@@ -3259,9 +4266,8 @@ function renderKanBancoHoras(cards) {
 }
 
 function renderKanTurmaTabs() {
-  const turmas = HOR_TURMA_ORDER.filter(t => horarioSemanal.some(r => r.turma_nome === t));
-  document.getElementById("kan-turma-tabs").innerHTML = turmas.map(t =>
-    `<button type="button" class="tab-btn ${t === kanTurmaAtual ? "active" : ""}" data-kan-turma="${esc(t)}">${esc(t)}</button>`
+  document.getElementById("kan-turma-tabs").innerHTML = turmasList.map(t =>
+    `<button type="button" class="tab-btn ${t.id === kanTurmaAtual ? "active" : ""}" data-kan-turma="${t.id}">${esc(t.nome)}</button>`
   ).join("");
   document.querySelectorAll("[data-kan-turma]").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -3296,15 +4302,15 @@ document.getElementById("kan-week-next").addEventListener("click", () => {
 });
 
 function renderKanban() {
-  if (!kanTurmaAtual || !horarioSemanal.some(r => r.turma_nome === kanTurmaAtual)) {
-    kanTurmaAtual = HOR_TURMA_ORDER.find(t => horarioSemanal.some(r => r.turma_nome === t)) || kanTurmaAtual;
+  if (!kanTurmaAtual || !turmasList.some(t => t.id === kanTurmaAtual)) {
+    kanTurmaAtual = (turmasList.find(t => horarioSemanal.some(r => r.turma_id === t.id)) || turmasList[0] || {}).id || null;
   }
   if (kanSemanaAtual === null || !horWeeksForTurma(kanTurmaAtual).includes(kanSemanaAtual)) {
     kanSemanaAtual = horDefaultSemana(kanTurmaAtual);
   }
   renderKanTurmaTabs();
   renderKanWeekNav();
-  document.getElementById("kan-turma-count").textContent = kanTurmaAtual || "—";
+  document.getElementById("kan-turma-count").textContent = nomeDaTurma(kanTurmaAtual);
 
   if (kanSemanaAtual === null) {
     kanLastCards = [];
@@ -3317,7 +4323,7 @@ function renderKanban() {
   const now = new Date();
   const execMap = new Map(horarioExecucao.map(e => [e.horario_semanal_id, e]));
   const { min, max } = horWeekRange(kanTurmaAtual, kanSemanaAtual);
-  const rowsTurma = horarioSemanal.filter(r => r.turma_nome === kanTurmaAtual && r.semana_num === kanSemanaAtual);
+  const rowsTurma = horarioSemanal.filter(r => r.turma_id === kanTurmaAtual && r.semana_num === kanSemanaAtual);
   const cards = kanCardsForRows(rowsTurma, now, execMap);
   kanLastCards = cards;
 
@@ -3458,8 +4464,8 @@ document.querySelectorAll(".hor-tab").forEach(btn => {
 });
 
 function renderHorarios() {
-  if (!horTurmaAtual || !horarioSemanal.some(r => r.turma_nome === horTurmaAtual)) {
-    horTurmaAtual = HOR_TURMA_ORDER.find(t => horarioSemanal.some(r => r.turma_nome === t)) || horTurmaAtual;
+  if (!horTurmaAtual || !turmasList.some(t => t.id === horTurmaAtual)) {
+    horTurmaAtual = (turmasList.find(t => horarioSemanal.some(r => r.turma_id === t.id)) || turmasList[0] || {}).id || null;
   }
   if (horSemanaAtual === null || !horWeeksForTurma(horTurmaAtual).includes(horSemanaAtual)) {
     horSemanaAtual = horDefaultSemana(horTurmaAtual);
@@ -3928,6 +4934,7 @@ async function deleteStudent(id) {
     }
     closeDrawer();
     await loadStudents();
+    applyAnoLetivoFilter();
     renderAll();
     alert(`Aluno "${s.nome}" excluído com sucesso.`);
   } catch (err) {
@@ -4272,7 +5279,7 @@ async function executeSaveMatricula(){
       } else if (valorParcelaRaw) {
         const { error: finErr } = await supabase.from("matricula_financeiro").insert({
           aluno_id: alunoId,
-          ano_letivo: 2026,
+          ano_letivo: selectedAnoLetivo,
           tipo: "integral",
           valor_parcela: isNaN(valorParcela) ? null : valorParcela,
           dia_vencimento: (diaVenc && !isNaN(diaVenc)) ? diaVenc : null,
@@ -4288,11 +5295,12 @@ async function executeSaveMatricula(){
     document.querySelectorAll("#view-form .cpf-valid, #view-form .cpf-invalid").forEach(i => i.classList.remove("cpf-valid", "cpf-invalid"));
     editingStudentId = null;
     document.getElementById("form-title").textContent = "Nova matrícula";
-    document.getElementById("form-subtitle").textContent = "Mesmos campos do Requerimento de Matrícula em papel — turma de 2026";
+    document.getElementById("form-subtitle").textContent = `Mesmos campos do Requerimento de Matrícula em papel — turma de ${selectedAnoLetivo}`;
     labelEl.textContent = "Salvar matrícula";
     document.getElementById("self-resp-warning").hidden = true;
     succeeded = true;
     await loadStudents();
+    applyAnoLetivoFilter();
     renderAll();
     goto("students");
   } catch (err) {
@@ -4394,6 +5402,7 @@ document.getElementById("fotos-start-btn").addEventListener("click", async () =>
   pickBtn.disabled = false;
   try {
     await loadStudents();
+    applyAnoLetivoFilter();
     renderFotosTabela();
   } catch (err) {
     console.error(err);
@@ -4532,15 +5541,18 @@ function showView(name){
 
 /* ---------------- HOME: turma scope (rótulos e estado) ---------------- */
 
-/* A tabela `simulado_resultados` guarda "Turma 1"/"Turma 2" (rótulos genéricos herdados
-   do fluxo de importação/OMR). Os nomes reais das turmas (cadastro em `public.turmas`)
-   são "Pré-CEFET 1"/"Pré-CEFET 2". Em vez de migrar os dados (o que exigiria tocar no
-   fluxo de OMR/gabarito e no formulário de lançamento manual), mapeamos aqui só pra
-   exibição — é o caminho mais seguro e reversível. */
-const TURMA_LABELS = {'Turma 1':'Pré-CEFET 1', 'Turma 2':'Pré-CEFET 2'};
-function turmaLabel(t){ return t ? (TURMA_LABELS[t] || t) : 'Sem turma definida'; }
-function turmaShort(t){ return t==='Turma 1' ? 'T1' : (t==='Turma 2' ? 'T2' : '—'); }
-function turmaBadgeClass(t){ return t==='Turma 1' ? 't1' : (t==='Turma 2' ? 't2' : ''); }
+/* `simulado_resultados.turma_id` referencia turmas.id de verdade (a mesma tabela usada
+   em Alunos/Financeiro/Horários), então os rótulos aqui vêm de turmasList — já filtrada
+   pelo ano letivo selecionado — em vez de nomes genéricos fixos tipo "Turma 1"/"Turma 2". */
+function turmaLabel(turmaId){ return turmaId ? nomeDaTurma(turmaId) : 'Sem turma definida'; }
+function turmaShort(turmaId){
+  const idx = turmasList.findIndex(t => t.id === turmaId);
+  return idx === -1 ? '—' : 'T' + (idx + 1);
+}
+function turmaBadgeClass(turmaId){
+  const idx = turmasList.findIndex(t => t.id === turmaId);
+  return idx === -1 ? '' : 't' + ((idx % 2) + 1);
+}
 
 let state = {turma:'all', q:'', sortDesc:true};
 
@@ -4561,12 +5573,12 @@ function renderSimKpis(){
   const totalMatriculados = state.turma==='all' ? STUDENTS.length : STUDENTS.filter(s=>s.turma===state.turma).length;
   let html = `<div class="kpi"><div class="lbl">Alunos avaliados</div><div class="val">${scopedPresentes.length}</div><div class="sub">${totalMatriculados} matriculados no total</div></div>`;
   if (state.turma==='all') {
-    html += `<div class="kpi t1"><div class="lbl">Média Turma 1</div><div class="val">${t1.length?fmt1(avg(t1.map(s=>s.acertos))):'—'}<span style="font-size:15px;color:var(--sim-muted);font-family:var(--sim-sans)"> /50</span></div><div class="sub">${t1.length} presentes</div></div>`;
-    html += `<div class="kpi t2"><div class="lbl">Média Turma 2</div><div class="val">${t2.length?fmt1(avg(t2.map(s=>s.acertos))):'—'}<span style="font-size:15px;color:var(--sim-muted);font-family:var(--sim-sans)"> /50</span></div><div class="sub">${t2.length} presentes</div></div>`;
+    html += `<div class="kpi t1"><div class="lbl">Média ${esc(turmaLabel(CEFET_T1_ID))}</div><div class="val">${t1.length?fmt1(avg(t1.map(s=>s.acertos))):'—'}<span style="font-size:15px;color:var(--sim-muted);font-family:var(--sim-sans)"> /50</span></div><div class="sub">${t1.length} presentes</div></div>`;
+    html += `<div class="kpi t2"><div class="lbl">Média ${esc(turmaLabel(CEFET_T2_ID))}</div><div class="val">${t2.length?fmt1(avg(t2.map(s=>s.acertos))):'—'}<span style="font-size:15px;color:var(--sim-muted);font-family:var(--sim-sans)"> /50</span></div><div class="sub">${t2.length} presentes</div></div>`;
   } else {
-    html += `<div class="kpi ${turmaBadgeClass(state.turma)}"><div class="lbl">Média ${turmaLabel(state.turma)}</div><div class="val">${scopedPresentes.length?fmt1(avg(scopedPresentes.map(s=>s.acertos))):'—'}<span style="font-size:15px;color:var(--sim-muted);font-family:var(--sim-sans)"> /50</span></div><div class="sub">${scopedPresentes.length} presentes</div></div>`;
+    html += `<div class="kpi ${turmaBadgeClass(state.turma)}"><div class="lbl">Média ${esc(turmaLabel(state.turma))}</div><div class="val">${scopedPresentes.length?fmt1(avg(scopedPresentes.map(s=>s.acertos))):'—'}<span style="font-size:15px;color:var(--sim-muted);font-family:var(--sim-sans)"> /50</span></div><div class="sub">${scopedPresentes.length} presentes</div></div>`;
   }
-  html += `<div class="kpi falt"><div class="lbl">Faltosos</div><div class="val" style="color:var(--sim-danger)">${scopedFaltosos.length}</div><div class="sub">${scopedFaltosos.filter(s=>s.turma==="Turma 1").length} da T1 · ${scopedFaltosos.filter(s=>s.turma==="Turma 2").length} da T2</div></div>`;
+  html += `<div class="kpi falt"><div class="lbl">Faltosos</div><div class="val" style="color:var(--sim-danger)">${scopedFaltosos.length}</div><div class="sub">${scopedFaltosos.filter(s=>s.turma===CEFET_T1_ID).length} da ${esc(turmaShort(CEFET_T1_ID))} · ${scopedFaltosos.filter(s=>s.turma===CEFET_T2_ID).length} da ${esc(turmaShort(CEFET_T2_ID))}</div></div>`;
   document.getElementById('kpis').innerHTML = html;
 }
 
@@ -4682,7 +5694,7 @@ function renderTable(){
     const globalPos = rankedPosByRef.get(s) || 0;
     let posClass='pos';
     if(globalPos===1) posClass+=' top1'; else if(globalPos===2) posClass+=' top2'; else if(globalPos===3) posClass+=' top3';
-    const color = s.turma==='Turma 1' ? 'var(--sim-t1)' : (s.turma==='Turma 2' ? 'var(--sim-t2)' : 'var(--sim-muted)');
+    const color = s.turma===CEFET_T1_ID ? 'var(--sim-t1)' : (s.turma===CEFET_T2_ID ? 'var(--sim-t2)' : 'var(--sim-muted)');
     return `<tr data-nome="${encodeURIComponent(s.nome)}">
       <td class="${posClass}">${globalPos}º</td>
       <td class="nomecell">${simAvatarHTML(s.nome, 28)}${s.nome}</td>
@@ -4792,11 +5804,11 @@ async function renderEvolucao(s){
   try{
     const { data, error } = await supabase
       .from('simulado_resultados')
-      .select('aluno_id, nome_referencia, acertos, simulado:simulados(id, nome, data_aplicacao)');
+      .select('aluno_id, nome_referencia, acertos, simulado:simulados(id, nome, data_aplicacao, ano_letivo)');
     if (error) throw error;
     const nomeNorm = normName(s.nome);
     points = (data || [])
-      .filter(r => r.simulado)
+      .filter(r => r.simulado && r.simulado.ano_letivo === selectedAnoLetivo)
       .filter(r => (s.aluno_id && r.aluno_id) ? r.aluno_id === s.aluno_id : normName(r.nome_referencia) === nomeNorm)
       .map(r => ({ label: r.simulado.nome, data_aplicacao: r.simulado.data_aplicacao, acertos: r.acertos }));
     points.sort((a,b) => (a.data_aplicacao||'').localeCompare(b.data_aplicacao||''));
@@ -4830,7 +5842,7 @@ async function renderEvolucao(s){
   let dots = xs.map((x,i)=>{
     const shortLabel = (points[i].label||'').replace(/\s*simulado\s*pré-cefet/i,'').trim() || points[i].label;
     if(ys[i]==null) return `<text x="${x}" y="${H-pad+22}" text-anchor="middle" font-family="var(--sim-mono)" font-size="11" fill="var(--sim-muted)">NP</text><text x="${x}" y="${H-14}" text-anchor="middle" font-size="10" fill="var(--sim-muted)">${esc(shortLabel)}</text>`;
-    const color = i===n-1 ? (s.turma==='Turma 1'?'#0C8A63':'#C9791F') : '#8a8a8a';
+    const color = i===n-1 ? (s.turma===CEFET_T1_ID?'#0C8A63':'#C9791F') : '#8a8a8a';
     return `<circle cx="${x}" cy="${ys[i]}" r="5.5" fill="${color}" stroke="#fff" stroke-width="2"/>
       <text x="${x}" y="${ys[i]-12}" text-anchor="middle" font-family="var(--sim-mono)" font-weight="700" font-size="13" fill="var(--sim-ink)">${points[i].acertos}</text>
       <text x="${x}" y="${H-14}" text-anchor="middle" font-size="10" fill="var(--sim-muted)">${esc(shortLabel)}</text>`;
@@ -5015,7 +6027,7 @@ function checklistRowToEntry(row){
 }
 
 async function loadChecklistFromSupabase(){
-  const { data, error } = await supabase.from('conversa_checklist').select('*');
+  const { data, error } = await supabase.from('conversa_checklist').select('*').eq('ano_letivo', selectedAnoLetivo);
   if (error) { console.error('Erro ao carregar checklist de conversas:', error); checklistSynced = false; renderStorageNote(); return; }
   const fresh = {};
   (data || []).forEach(row => { fresh[row.aluno_nome] = checklistRowToEntry(row); });
@@ -5031,11 +6043,12 @@ async function upsertChecklistEntry(nome){
   saveChecklist(checklist);
   const { error } = await supabase.from('conversa_checklist').upsert({
     aluno_nome: nome,
+    ano_letivo: selectedAnoLetivo,
     status: e.status,
     notas: e.notas,
     done_at: e.doneAt,
     updated_at: new Date().toISOString()
-  }, { onConflict: 'aluno_nome' });
+  }, { onConflict: 'aluno_nome,ano_letivo' });
   if (error) { console.error('Erro ao salvar conversa no Supabase:', error); checklistSynced = false; renderStorageNote(); }
   else { checklistSynced = true; renderStorageNote(); }
 }
@@ -5044,6 +6057,8 @@ function subscribeChecklistRealtime(){
   if (checklistChannel) return;
   checklistChannel = supabase.channel('conversa_checklist_sync')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'conversa_checklist' }, payload => {
+      const row = payload.eventType === 'DELETE' ? payload.old : payload.new;
+      if (row.ano_letivo !== selectedAnoLetivo) return; // evento de outro ano letivo — não afeta a view atual
       if (payload.eventType === 'DELETE') {
         delete checklist[payload.old.aluno_nome];
       } else {
@@ -5326,8 +6341,8 @@ function renderProfOverview(){
 
   const rows = DEFAULT_TOPIC_ORDER.map(topic=>{
     const pct = topicAvg(topic, withTopic);
-    const t1pct = topicAvg(topic, withTopic.filter(s=>s.turma==='Turma 1'));
-    const t2pct = topicAvg(topic, withTopic.filter(s=>s.turma==='Turma 2'));
+    const t1pct = topicAvg(topic, withTopic.filter(s=>s.turma===CEFET_T1_ID));
+    const t2pct = topicAvg(topic, withTopic.filter(s=>s.turma===CEFET_T2_ID));
     return { topic, teacher: TEACHERS[topic] || null, pct, t1pct, t2pct };
   });
 
@@ -5375,8 +6390,8 @@ function reportText(topic){
   const [_, from, to] = TOPIC_RANGES.find(r=>r[0]===topic);
   const teacher = TEACHERS[topic] || '(não informado)';
   const withTopic = presentes.filter(s=>s.topicos);
-  const t1g = withTopic.filter(s=>s.turma==='Turma 1');
-  const t2g = withTopic.filter(s=>s.turma==='Turma 2');
+  const t1g = withTopic.filter(s=>s.turma===CEFET_T1_ID);
+  const t2g = withTopic.filter(s=>s.turma===CEFET_T2_ID);
   const pAll = topicAvg(topic, withTopic), p1 = topicAvg(topic, t1g), p2 = topicAvg(topic, t2g);
 
   const qs = [];
@@ -5390,10 +6405,10 @@ function reportText(topic){
   let txt = '';
   txt += `RELATÓRIO — ${topic.toUpperCase()} (${to-from+1} questões, de Q${from} a Q${to})\n`;
   txt += `Professor(a): ${teacher}\n`;
-  txt += `3º Simulado Pré-CEFET — Percurso Cataguases\n`;
+  txt += `${currentSimuladoMeta ? currentSimuladoMeta.nome : 'Simulado'} — Percurso Cataguases\n`;
   txt += `\nDESEMPENHO GERAL\n`;
-  txt += `Turma 1: ${fmt1(p1)}% (${t1g.length} alunos avaliados)\n`;
-  txt += `Turma 2: ${fmt1(p2)}% (${t2g.length} alunos avaliados)\n`;
+  txt += `${turmaLabel(CEFET_T1_ID)}: ${fmt1(p1)}% (${t1g.length} alunos avaliados)\n`;
+  txt += `${turmaLabel(CEFET_T2_ID)}: ${fmt1(p2)}% (${t2g.length} alunos avaliados)\n`;
   txt += `Média geral (as duas turmas): ${fmt1(pAll)}%\n`;
   txt += `\nQUESTÕES QUE MAIS GERARAM DÚVIDA\n`;
   qs.slice(0,5).forEach(q=>{
@@ -5405,7 +6420,7 @@ function reportText(topic){
   txt += `\nALUNOS QUE PRECISAM DE MAIS ATENÇÃO NESTE CONTEÚDO (abaixo de 50%)\n`;
   if(weakStudents.length===0) txt += 'Nenhum aluno abaixo de 50% neste conteúdo — bom sinal!\n';
   weakStudents.forEach(w=>{
-    txt += `- ${w.s.nome} (${w.s.turma==='Turma 1'?'T1':'T2'}) — ${w.n}/${DEFAULT_TOPIC_TOTALS[topic]} acertos (${fmt1(w.pct)}%)\n`;
+    txt += `- ${w.s.nome} (${turmaShort(w.s.turma)}) — ${w.n}/${DEFAULT_TOPIC_TOTALS[topic]} acertos (${fmt1(w.pct)}%)\n`;
   });
   return txt;
 }
@@ -5414,8 +6429,8 @@ function openProfReport(topic){
   const teacher = TEACHERS[topic];
   const [_, from, to] = TOPIC_RANGES.find(r=>r[0]===topic);
   const withTopic = presentes.filter(s=>s.topicos);
-  const t1g = withTopic.filter(s=>s.turma==='Turma 1');
-  const t2g = withTopic.filter(s=>s.turma==='Turma 2');
+  const t1g = withTopic.filter(s=>s.turma===CEFET_T1_ID);
+  const t2g = withTopic.filter(s=>s.turma===CEFET_T2_ID);
   const pAll = topicAvg(topic, withTopic), p1 = topicAvg(topic, t1g), p2 = topicAvg(topic, t2g);
 
   const qs = [];
@@ -5425,8 +6440,8 @@ function openProfReport(topic){
 
   const weakStudents = withTopic.map(s=>({s, pct: s.topicos[topic]/DEFAULT_TOPIC_TOTALS[topic]*100, n:s.topicos[topic]}))
     .filter(w=>w.pct<50).sort((a,b)=>a.pct-b.pct);
-  const weakT1 = weakStudents.filter(w=>w.s.turma==='Turma 1');
-  const weakT2 = weakStudents.filter(w=>w.s.turma==='Turma 2');
+  const weakT1 = weakStudents.filter(w=>w.s.turma===CEFET_T1_ID);
+  const weakT2 = weakStudents.filter(w=>w.s.turma===CEFET_T2_ID);
 
   const panel = document.getElementById('profDetailPanel');
   const today = new Date().toLocaleDateString('pt-BR');
@@ -5514,14 +6529,14 @@ function openProfReport(topic){
   function renderScoreResults(){
     const n = parseInt(scoreSel.value);
     const group = withTopic.filter(s=>s.topicos[topic]===n);
-    const g1 = group.filter(s=>s.turma==='Turma 1');
-    const g2 = group.filter(s=>s.turma==='Turma 2');
+    const g1 = group.filter(s=>s.turma===CEFET_T1_ID);
+    const g2 = group.filter(s=>s.turma===CEFET_T2_ID);
     const el = document.getElementById('profScoreResults');
     const col = (list, label) => `<div class="prof-stu-col">
-        <h4>${label} (${list.length})</h4>
+        <h4>${esc(label)} (${list.length})</h4>
         ${list.length? list.map(s=>`<div class="prof-stu-row"><span>${s.nome}</span><b style="color:var(--sim-muted)">${fmt1(s.pct)}% geral</b></div>`).join('') : '<div class="prof-empty">Ninguém nesta faixa.</div>'}
       </div>`;
-    el.innerHTML = col(g1,'Turma 1') + col(g2,'Turma 2');
+    el.innerHTML = col(g1, turmaLabel(CEFET_T1_ID)) + col(g2, turmaLabel(CEFET_T2_ID));
   }
   scoreSel.addEventListener('change', renderScoreResults);
   renderScoreResults();
@@ -5574,8 +6589,8 @@ function generateTips(topic, ctx){
 
   const gap = Math.abs(p1-p2);
   if(gap >= 12){
-    const melhor = p1>p2 ? 'Turma 1' : 'Turma 2';
-    const pior = p1>p2 ? 'Turma 2' : 'Turma 1';
+    const melhor = p1>p2 ? turmaLabel(CEFET_T1_ID) : turmaLabel(CEFET_T2_ID);
+    const pior = p1>p2 ? turmaLabel(CEFET_T2_ID) : turmaLabel(CEFET_T1_ID);
     tips.push(`Há uma diferença grande entre as turmas (${fmt1(gap)} pontos percentuais, ${melhor} à frente). Vale considerar um ritmo ou abordagem diferente para a ${pior}, em vez de tratar as duas turmas da mesma forma neste conteúdo.`);
   }
 
@@ -5624,21 +6639,21 @@ function generateReportPdf(topic, teacher){
   doc.text(`Relatório de Desempenho — ${topic}`, MX, y); y+=7;
   doc.setFont('helvetica','normal'); doc.setFontSize(10.5); doc.setTextColor(...muted);
   const today = new Date().toLocaleDateString('pt-BR');
-  doc.text(`3º Simulado Pré-CEFET · ${teacher?`Professor(a): ${teacher}`:'Professor(a) não informado'} · Gerado em ${today}`, MX, y); y+=12;
+  doc.text(`${currentSimuladoMeta ? currentSimuladoMeta.nome : 'Simulado'} · ${teacher?`Professor(a): ${teacher}`:'Professor(a) não informado'} · Gerado em ${today}`, MX, y); y+=12;
 
   // KPIs
   const [_, from, to] = TOPIC_RANGES.find(r=>r[0]===topic);
   const withTopic = presentes.filter(s=>s.topicos);
-  const t1g = withTopic.filter(s=>s.turma==='Turma 1');
-  const t2g = withTopic.filter(s=>s.turma==='Turma 2');
+  const t1g = withTopic.filter(s=>s.turma===CEFET_T1_ID);
+  const t2g = withTopic.filter(s=>s.turma===CEFET_T2_ID);
   const pAll = topicAvg(topic, withTopic), p1 = topicAvg(topic, t1g), p2 = topicAvg(topic, t2g);
   const weakStudents = withTopic.map(s=>({s, pct: s.topicos[topic]/DEFAULT_TOPIC_TOTALS[topic]*100, n:s.topicos[topic]}))
     .filter(w=>w.pct<50).sort((a,b)=>a.pct-b.pct);
 
   const kpis = [
     ['Média geral', fmt1(pAll)+'%', ink],
-    ['Turma 1', fmt1(p1)+'%', [12,138,99]],
-    ['Turma 2', fmt1(p2)+'%', [140,83,19]],
+    [turmaLabel(CEFET_T1_ID), fmt1(p1)+'%', [12,138,99]],
+    [turmaLabel(CEFET_T2_ID), fmt1(p2)+'%', [140,83,19]],
     ['Abaixo de 50%', String(weakStudents.length)+' alunos', danger],
   ];
   const kw = (PW-2*MX)/4;
@@ -5763,6 +6778,20 @@ function generateReportPdf(topic, teacher){
 let STUDENTS = [];
 let presentes = [], faltosos = [], t1 = [], t2 = [], ranked = [];
 let rankedPosByRef = new Map(); // aluno -> posição no ranking geral (evita indexOf O(n) em renderTable)
+
+/* As análises comparativas do HOME (Turma 1 x Turma 2, gráfico de tópicos, alunos fracos,
+   relatório PDF) são desenhadas especificamente para comparar as DUAS turmas de CEFET —
+   não é um "para cada turma genérica". CEFET_T1_ID/CEFET_T2_ID resolvem essas duas turmas
+   reais (por tipo='CEFET', na ordem de TURMA_ORDER) a partir de turmasList, já filtrada
+   pelo ano letivo selecionado. Recalculados a cada renderSimuladoAll()/recomputeSimDerived(). */
+let CEFET_T1_ID = null, CEFET_T2_ID = null;
+function updateCefetTurmaIds(){
+  const cefet = turmasList
+    .filter(t => t.tipo === 'CEFET')
+    .sort((a, b) => TURMA_ORDER.indexOf(a.nome) - TURMA_ORDER.indexOf(b.nome));
+  CEFET_T1_ID = cefet[0] ? cefet[0].id : null;
+  CEFET_T2_ID = cefet[1] ? cefet[1].id : null;
+}
 /* Versões já recortadas pela turma selecionada em `state.turma` (ver #turmaFilter) —
    usadas por tudo no painel HOME que deve respeitar o filtro de turma. */
 let scopedPresentes = [], scopedFaltosos = [], scopedRanked = [];
@@ -5805,12 +6834,12 @@ function computeFaltosos(){
     .filter(s => s.acertos===null || s.acertos===undefined)
     .map(s => ({ nome: s.nome, turma: s.turma, aluno_id: s.aluno_id, semLancamento: false }));
   const jaTemLinha = new Set(STUDENTS.map(s => normName(s.nome)));
-  const CEFET_TURMA_LABEL = {'Pré-CEFET 1':'Turma 1', 'Pré-CEFET 2':'Turma 2'};
+  const cefetIds = omrCefetTurmaIds();
   const semLinha = students
     .filter(s => (s.status || '').toLowerCase() !== 'desistente')
     .filter(s => !jaTemLinha.has(normName(s.nome)))
-    .filter(s => CEFET_TURMA_LABEL[s.turmaNome])
-    .map(s => ({ nome: s.nome, turma: CEFET_TURMA_LABEL[s.turmaNome], aluno_id: s.id, semLancamento: true }));
+    .filter(s => cefetIds.has(s.turmaId))
+    .map(s => ({ nome: s.nome, turma: s.turmaId, aluno_id: s.id, semLancamento: true }));
   const seen = new Set();
   const merged = [];
   [...comLinha, ...semLinha].forEach(item => {
@@ -5858,10 +6887,11 @@ function computeQStats(pop){
 }
 
 function recomputeSimDerived(){
+  updateCefetTurmaIds();
   presentes = STUDENTS.filter(s=>s.acertos!==null && s.acertos!==undefined);
   faltosos = computeFaltosos();
-  t1 = presentes.filter(s=>s.turma==="Turma 1");
-  t2 = presentes.filter(s=>s.turma==="Turma 2");
+  t1 = presentes.filter(s=>s.turma===CEFET_T1_ID);
+  t2 = presentes.filter(s=>s.turma===CEFET_T2_ID);
   ranked = [...presentes].sort(compareRanked);
   rankedPosByRef = new Map(ranked.map((s, i) => [s, i + 1]));
 
@@ -5880,7 +6910,7 @@ function reshapeSimResultRow(row){
     id: row.id,
     aluno_id: row.aluno_id,
     nome: row.nome_referencia,
-    turma: row.turma,
+    turma: row.turma_id,
     acertos: row.acertos,
     pct: (row.pct === null || row.pct === undefined) ? null : Number(row.pct),
     topicos: row.topicos || {},
@@ -5896,13 +6926,24 @@ function reshapeSimResultRow(row){
 }
 
 /* Renderiza tudo que depende dos dados do simulado carregado (STUDENTS) */
+function renderSimTurmaFilterButtons(){
+  const el = document.getElementById('turmaFilter');
+  if (!el) return;
+  if (!turmasList.some(t => t.id === state.turma)) state.turma = 'all';
+  el.innerHTML = `<button data-t="all" class="${state.turma === 'all' ? 'active' : ''}">Todas as turmas</button>` +
+    turmasList.map(t => `<button data-t="${t.id}" class="${state.turma === t.id ? 'active' : ''}">${esc(t.nome)}</button>`).join('');
+}
+
 function renderSimuladoAll(){
+  renderSimTurmaFilterButtons();
   recomputeSimDerived();
   setTopicMetaForRound(currentSimuladoMeta);
 
   const meta = currentSimuladoMeta;
   document.getElementById('simHeroTitle').textContent = meta ? meta.nome : 'Nenhum simulado selecionado';
-  document.getElementById('simHeroSub').textContent = 'Turma 1 & Turma 2 · Desempenho por aluno e por tópico';
+  document.getElementById('simHeroSub').textContent = turmasList.length
+    ? turmasList.map(t => t.nome).join(' · ') + ' · Desempenho por aluno e por tópico'
+    : 'Desempenho por aluno e por tópico';
   document.getElementById('simHeroRight').innerHTML = meta
     ? `Aplicação ${meta.data_aplicacao ? fmtDate(meta.data_aplicacao) : '—'}<br>${meta.num_questoes || 50} questões · 4 alternativas`
     : '';
@@ -5956,7 +6997,7 @@ function renderLancarList(){
   if (lancarFilterMode === 'lancados') {
     items = STUDENTS.map(s => ({ nome: s.nome, turma: s.turma, faltou: s.acertos===null || s.acertos===undefined }));
   } else {
-    items = lancarFaltantesList().map(s => ({ nome: s.nome, turma: s.turmaNome, faltou: false }));
+    items = lancarFaltantesList().map(s => ({ nome: s.nome, turma: s.turmaId, faltou: false }));
   }
   if (q) items = items.filter(i => i.nome.toLowerCase().includes(q));
   items.sort((a,b) => a.nome.localeCompare(b.nome, 'pt-BR'));
@@ -5968,7 +7009,7 @@ function renderLancarList(){
   list.innerHTML = items.map(i => `
     <div class="lancar-item ${i.nome===lancarSelectedNome?'selected':''}" data-nome="${encodeURIComponent(i.nome)}">
       <span>${esc(i.nome)}${i.faltou?' <span class="hint">(faltou)</span>':''}</span>
-      <span class="lancar-item-turma">${i.turma ? (i.turma==='Turma 1'?'T1':i.turma==='Turma 2'?'T2':esc(i.turma)) : ''}</span>
+      <span class="lancar-item-turma">${i.turma ? esc(turmaShort(i.turma)) : ''}</span>
     </div>`).join('');
   list.querySelectorAll('.lancar-item').forEach(el => {
     el.addEventListener('click', () => {
@@ -5996,10 +7037,10 @@ function renderLancarForm(){
   document.getElementById('lancarFormNome').textContent = lancarSelectedNome;
   document.getElementById('lancarFaltou').checked = !!existing && (existing.acertos===null || existing.acertos===undefined);
   const turmaSel = document.getElementById('lancarTurma');
-  // cadastro.turmaNome guarda o nome real da turma ("Pré-CEFET 1"/"Pré-CEFET 2"); os
-  // resultados de simulado usam os rótulos genéricos "Turma 1"/"Turma 2" — mesma
-  // conversão usada no fluxo de OMR (ver omrStudentTurma).
-  const turmaPadrao = (existing && existing.turma) || (cadastro && cadastro.turmaNome === 'Pré-CEFET 2' ? 'Turma 2' : 'Turma 1');
+  turmaSel.innerHTML = turmasList.map(t => `<option value="${t.id}">${esc(t.nome)}</option>`).join('');
+  // cadastro.turmaId é a turma real do aluno (cadastro em Alunos) — usada como padrão
+  // ao lançar um resultado, caso ainda não haja um resultado anterior com turma definida.
+  const turmaPadrao = (existing && existing.turma) || (cadastro && cadastro.turmaId) || (turmasList[0] && turmasList[0].id) || '';
   turmaSel.value = turmaPadrao;
 
   const topicosWrap = document.getElementById('lancarTopicos');
@@ -6042,7 +7083,7 @@ async function salvarLancarResultado(){
   const nomeSalvo = lancarSelectedNome;
   try {
     const faltou = document.getElementById('lancarFaltou').checked;
-    const turma = document.getElementById('lancarTurma').value;
+    const turmaId = document.getElementById('lancarTurma').value || null;
     let acertos = null, pct = null, topicos = null;
     if (!faltou) {
       const inputs = [...document.getElementById('lancarTopicos').querySelectorAll('input')];
@@ -6058,7 +7099,7 @@ async function salvarLancarResultado(){
       simulado_id: currentSimuladoMeta.id,
       aluno_id: alunoId,
       nome_referencia: nomeSalvo,
-      turma,
+      turma_id: turmaId,
       acertos,
       pct,
       topicos,
@@ -6088,6 +7129,7 @@ async function loadSimuladosList(){
   const { data, error } = await supabase
     .from('simulados')
     .select('*')
+    .eq('ano_letivo', selectedAnoLetivo)
     .order('data_aplicacao', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false });
   if (error) { console.error(error); simuladosList = []; return; }
@@ -6143,31 +7185,49 @@ function matchAlunoIdByName(nome){
   return found ? found.id : null;
 }
 
+/* O JSON importado (gerado por uma ferramenta externa de OMR) traz rótulos livres de
+   turma — geralmente "Turma 1"/"Turma 2", às vezes já o nome real. Preferimos sempre a
+   turma do cadastro do aluno (mais confiável); esse resolver é só o fallback quando o
+   aluno não bate por nome com ninguém cadastrado. */
+function resolveTurmaIdFromLabel(label){
+  if (!label) return null;
+  const norm = String(label).trim().toLowerCase();
+  if (norm === 'turma 1') return (turmasList.find(t => t.tipo === 'CEFET' && /1/.test(t.nome)) || {}).id || null;
+  if (norm === 'turma 2') return (turmasList.find(t => t.tipo === 'CEFET' && /2/.test(t.nome)) || {}).id || null;
+  const byName = turmasList.find(t => t.nome.toLowerCase() === norm);
+  return byName ? byName.id : null;
+}
+
 async function importSimuladoRound(nomeRodada, dataAplicacao, parsedStudents){
   const { data: roundData, error: roundErr } = await supabase
     .from('simulados')
-    .insert({ nome: nomeRodada, data_aplicacao: dataAplicacao || null, num_questoes: 50, topico_ranges: { tipo: 'por_questao', ranges: TOPIC_RANGES } })
+    .insert({ nome: nomeRodada, data_aplicacao: dataAplicacao || null, ano_letivo: selectedAnoLetivo, num_questoes: 50, topico_ranges: { tipo: 'por_questao', ranges: TOPIC_RANGES } })
     .select()
     .single();
   if (roundErr) throw roundErr;
 
-  const rows = parsedStudents.map(s => ({
-    simulado_id: roundData.id,
-    aluno_id: matchAlunoIdByName(s.nome),
-    nome_referencia: s.nome,
-    turma: s.turma ?? null,
-    acertos: s.acertos ?? null,
-    pct: s.pct ?? null,
-    topicos: s.topicos ?? null,
-    ok: s.ok ?? null,
-    marc: s.marc ?? null,
-    gab: s.gab ?? null,
-    sim1: s.sim1 ?? null,
-    sim2: s.sim2 ?? null,
-    part: s.part ?? null,
-    comp: s.comp ?? null,
-    grupo: s.grupo ?? null,
-  }));
+  const rows = parsedStudents.map(s => {
+    const alunoId = matchAlunoIdByName(s.nome);
+    const cadastro = alunoId ? students.find(st => st.id === alunoId) : null;
+    const turmaId = (cadastro && cadastro.turmaId) || resolveTurmaIdFromLabel(s.turma);
+    return {
+      simulado_id: roundData.id,
+      aluno_id: alunoId,
+      nome_referencia: s.nome,
+      turma_id: turmaId,
+      acertos: s.acertos ?? null,
+      pct: s.pct ?? null,
+      topicos: s.topicos ?? null,
+      ok: s.ok ?? null,
+      marc: s.marc ?? null,
+      gab: s.gab ?? null,
+      sim1: s.sim1 ?? null,
+      sim2: s.sim2 ?? null,
+      part: s.part ?? null,
+      comp: s.comp ?? null,
+      grupo: s.grupo ?? null,
+    };
+  });
 
   if (rows.length) {
     const { error: insErr } = await supabase.from('simulado_resultados').insert(rows);
@@ -6486,9 +7546,14 @@ function resetOmrState(){
   const fi = document.getElementById('omrFileInput'); if (fi) fi.value = '';
 }
 
+function omrCefetTurmaIds(){
+  return new Set(turmasList.filter(t => t.tipo === 'CEFET').map(t => t.id));
+}
 function populateOmrRoster(){
-  const roster = students.filter(s => s.turmaNome === 'Pré-CEFET 1' || s.turmaNome === 'Pré-CEFET 2');
+  const cefetIds = omrCefetTurmaIds();
+  const roster = students.filter(s => cefetIds.has(s.turmaId));
   document.getElementById('omrStudentList').innerHTML = roster.map(s => `<option value="${esc(s.nome)}">`).join('');
+  document.getElementById('omrStudentTurma').innerHTML = turmasList.filter(t => t.tipo === 'CEFET').map(t => `<option value="${t.id}">${esc(t.nome)}</option>`).join('');
   omrRosterPopulated = true;
 }
 
@@ -6532,7 +7597,7 @@ async function handleOmrFiles(fileList){
         await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
         omrSheets.push({
           canvas, corners: autoGuessCorners(canvas),
-          studentName: '', alunoId: null, turma: 'Turma 1',
+          studentName: '', alunoId: null, turma: (turmasList.find(t => t.tipo === 'CEFET') || {}).id || null,
           marc: null, flags: null, H: null, CW: OMR_CANVAS_CW, CH: OMR_CANVAS_CH,
           fileLabel: file.name + (pdf.numPages > 1 ? (' · pág. ' + p) : ''),
           thumbUrl: null,
@@ -6667,7 +7732,7 @@ async function saveOmrSheet(sheet, gab){
     simulado_id: currentSimuladoMeta.id,
     aluno_id: alunoId,
     nome_referencia: sheet.studentName,
-    turma: sheet.turma,
+    turma_id: sheet.turma || null,
     acertos, pct, topicos,
     ok, marc, gab,
   };
@@ -6739,12 +7804,12 @@ function wireGabaritoOmrOnce(){
     document.getElementById('omrConfirmCorners').classList.add('hidden');
     document.getElementById('omrStudentPick').classList.remove('hidden');
     document.getElementById('omrStudentSearch').value = sheet.studentName || '';
-    document.getElementById('omrStudentTurma').value = sheet.turma || 'Turma 1';
+    document.getElementById('omrStudentTurma').value = sheet.turma || (turmasList.find(t => t.tipo === 'CEFET') || {}).id || '';
     renderOmrThumbs();
   });
   document.getElementById('omrStudentSearch').addEventListener('input', (e) => {
     const cadastro = students.find(s => s.nome === e.target.value.trim());
-    if (cadastro) document.getElementById('omrStudentTurma').value = cadastro.turmaNome === 'Pré-CEFET 2' ? 'Turma 2' : 'Turma 1';
+    if (cadastro && cadastro.turmaId) document.getElementById('omrStudentTurma').value = cadastro.turmaId;
   });
   document.getElementById('omrConfirmSheet').addEventListener('click', () => {
     const idx = omrCurrentSheetIdx, sheet = omrSheets[idx];
@@ -6939,10 +8004,12 @@ function wireSimuladoOnce(){
 async function loadDrawerSimulado(alunoId){
   const { data, error } = await supabase
     .from('simulado_resultados')
-    .select('acertos, pct, turma, simulado:simulados(id, nome, data_aplicacao)')
+    .select('acertos, pct, simulado:simulados(id, nome, data_aplicacao, ano_letivo)')
     .eq('aluno_id', alunoId);
   if (error || !data || !data.length) return null;
-  const sorted = [...data].sort((a, b) => {
+  const doAno = data.filter(r => r.simulado && r.simulado.ano_letivo === selectedAnoLetivo);
+  if (!doAno.length) return null;
+  const sorted = [...doAno].sort((a, b) => {
     const da = (a.simulado && a.simulado.data_aplicacao) || '';
     const db = (b.simulado && b.simulado.data_aplicacao) || '';
     return db.localeCompare(da);
@@ -7041,10 +8108,16 @@ async function bootstrapData() {
   statusEl.textContent = "Carregando dados…";
   try {
     await Promise.all([loadTurmas(), loadStudents(), loadPresencas(), loadProfessores(), loadHorarioSemanal(), loadRegistrosAula(), loadHorarioExecucao()]);
+    computeAnosDisponiveis();
+    const savedAno = Number(localStorage.getItem(ANO_LETIVO_KEY));
+    selectedAnoLetivo = anosDisponiveis.includes(savedAno) ? savedAno : anosDisponiveis[0];
+    applyAnoLetivoFilter();
+    renderAnoSwitch();
     populateTurmaFilters();
     document.getElementById("f-data-matricula").value = new Date().toISOString().slice(0, 10);
     renderAll();
     initSimulados().catch(err => console.error("Erro ao carregar simulados:", err));
+    initBolsao().catch(err => console.error("Erro ao carregar o Bolsão:", err));
     statusEl.textContent = "Dados sincronizados agora";
   } catch (err) {
     console.error(err);

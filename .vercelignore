@@ -1,0 +1,10 @@
+# Publica só as páginas do site. Os arquivos de importação (.sql, .json, pastas de
+# presença/horas/fotos) têm dados de alunos e responsáveis e NÃO podem ir para a internet.
+/*
+!index.html
+!landing.html
+!responsavel.html
+!logo-percurso.png
+!logo-percurso-icone.png
+!assets_logo_full.png
+!fotos-aprovacoes

@@ -1,3 +1,5 @@
 # Arquivos de checagem/temporários usados durante o desenvolvimento
 *.tmp
 .DS_Store
+
+.vercel
