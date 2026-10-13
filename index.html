@@ -1137,6 +1137,7 @@
   .bs-valor-linha { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; font-size: 13px; color: var(--text-muted); }
   .bs-valor-num { font-family: var(--font-mono); font-size: 24px; font-weight: 700; color: var(--accent-strong); font-variant-numeric: tabular-nums; }
   .bs-alerta { color: var(--warning); }
+  #nova-versao { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 200; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; max-width: calc(100vw - 32px); background: var(--surface); color: var(--text); border: 1px solid var(--accent); border-radius: 10px; box-shadow: var(--shadow-lift); padding: 10px 14px; font-size: 13px; font-weight: 600; }
   .bs-chk { display: inline-flex; align-items: center; gap: 7px; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-muted); }
   .bs-chk input { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex: none; }
   .bs-conv-cel { min-width: 140px; max-width: 260px; }
@@ -2659,7 +2660,7 @@ function bsBolsaTag(b){ const cls = b <= 10 ? 'b1' : b >= 80 ? 'b4' : b >= 40 ? 
 function bsAbrevArea(a){ return a === 'Português' ? 'Port.' : a === 'Matemática' ? 'Mat.' : a; }
 
 /* ---------- carregar e sincronizar ---------- */
-async function bsCarregar(){
+async function bsCarregar(deFora){
   const [rp, ra] = await Promise.all([
     supabase.from('bolsao_provas').select('*').order('created_at'),
     supabase.from('bolsao_alunos').select('*').order('created_at')
@@ -2677,12 +2678,12 @@ async function bsCarregar(){
     bs.edicao = edicoes.includes(salva) ? salva : (edicoes[0] || null);
   }
   bsAviso('');
-  bsRenderTudo();
+  bsRenderTudo(deFora); // deFora: não redesenha o campo em que alguém está digitando
 }
 function bsAssinar(){
   if (bs.canal) return;
   let timer = null;
-  const recarregar = () => { clearTimeout(timer); timer = setTimeout(bsCarregar, 250); };
+  const recarregar = () => { clearTimeout(timer); timer = setTimeout(() => bsCarregar(true), 250); };
   bs.canal = supabase.channel('bolsao_sync')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'bolsao_alunos' }, payload => {
       if (payload.eventType === 'DELETE'){
@@ -2694,12 +2695,32 @@ function bsAssinar(){
       bsRenderTudo(true);
     })
     .on('postgres_changes', { event: '*', schema: 'public', table: 'bolsao_provas' }, recarregar)
-    .subscribe();
+    .subscribe(status => {
+      if (status === 'SUBSCRIBED'){
+        // ao reconectar (queda de internet, computador que dormiu) busca tudo de novo, para não perder o que mudou nesse intervalo
+        if (bs.conectouAntes) bsCarregar(true);
+        bs.conectouAntes = true;
+        if (bs.avisoTempoReal){ bs.avisoTempoReal = false; bsAviso(''); }
+      } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT'){
+        bs.avisoTempoReal = true;
+        bsAviso('A atualização em tempo real foi interrompida. Tentando reconectar…');
+      }
+    });
+}
+/* rede de segurança: quem volta para a aba, recupera a internet ou deixa o painel aberto por horas também recebe o que os outros mudaram */
+function bsManterAtualizado(){
+  if (bs.mantendo) return;
+  bs.mantendo = true;
+  const atualizar = () => { if (document.visibilityState === 'visible') bsCarregar(true); };
+  document.addEventListener('visibilitychange', atualizar);
+  window.addEventListener('online', atualizar);
+  setInterval(atualizar, 120000);
 }
 async function initBolsao(){
   if (!bs.iniciado){ bs.iniciado = true; bsLigarEventos(); }
   await bsCarregar();
   bsAssinar();
+  bsManterAtualizado();
 }
 
 /* ---------- render geral ---------- */
@@ -8293,6 +8314,34 @@ document.getElementById("login-theme-toggle").addEventListener("click", () => {
   let saved = null;
   try { saved = localStorage.getItem(THEME_KEY); } catch (e) {}
   if (saved) applyTheme(saved);
+})();
+
+/* ===================== aviso de nova versão do painel ===================== */
+/* Quem deixa o painel aberto não recebe sozinho uma versão publicada depois. A cada 3 minutos (e ao voltar para a aba)
+   o painel confere se o arquivo no servidor mudou e mostra um aviso para atualizar, sem recarregar sozinho
+   para não apagar o que a pessoa estiver digitando. */
+(function(){
+  let base = null, avisou = false;
+  async function versao(){
+    try { const r = await fetch(location.pathname, { method: 'HEAD', cache: 'no-store' }); return r.ok ? r.headers.get('etag') : null; }
+    catch(e){ return null; }
+  }
+  function mostrar(){
+    const d = document.createElement('div');
+    d.id = 'nova-versao'; d.setAttribute('role', 'status');
+    d.innerHTML = '<span>Há uma nova versão do painel disponível.</span><button type="button" class="btn btn-primary">Atualizar agora</button>';
+    d.querySelector('button').addEventListener('click', () => location.reload());
+    document.body.appendChild(d);
+  }
+  async function checar(){
+    if (avisou || document.visibilityState !== 'visible') return;
+    const e = await versao(); if (!e) return;
+    if (base === null){ base = e; return; }
+    if (e !== base){ avisou = true; mostrar(); }
+  }
+  checar();
+  setInterval(checar, 180000);
+  document.addEventListener('visibilitychange', checar);
 })();
 
 /* ===================== init ===================== */
