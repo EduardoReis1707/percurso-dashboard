@@ -5767,7 +5767,7 @@ async function executeSaveMatricula(){
 
 /* ===================== validação de RG, telefone, datas e e-mail ===================== */
 /* RG não tem dígito verificador nacional: conferimos o formato (só letras/dígitos/. - /), o tamanho
-   plausível e as trocas mais comuns (igual ao CPF, repetido, igual ao do responsável). */
+   plausível e as trocas mais comuns (repetido, igual ao do responsável). RG igual ao CPF é aceito: há RGs que usam o número do CPF. */
 function maskPhoneBR(v) {
   const d = String(v || "").replace(/\D/g, "").slice(0, 11);
   if (d.length <= 2) return d.length ? "(" + d : "";
@@ -5792,7 +5792,6 @@ function valRG(v, cpfRaw) {
   if (d.length < 5) return "RG muito curto — confira";
   if (d.length > 12) return "RG muito longo — confira";
   if (/^(\d)\1+$/.test(d)) return "RG com dígitos repetidos — confira";
-  if (cpfRaw && d === String(cpfRaw).replace(/\D/g, "")) return "RG igual ao CPF — confira";
   return "";
 }
 function valEmail(v) {
