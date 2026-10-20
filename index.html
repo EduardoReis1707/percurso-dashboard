@@ -8892,17 +8892,26 @@ async function initSimulados(){
    Substitui os campos fixos sim1/sim2 (que só existiam nas linhas do 3º simulado e deixavam o
    4º simulado sem "histórico", "queda de acertos" e comparação com o simulado anterior). */
 let SIM_HIST = { byAluno: new Map(), byNome: new Map() };
+/* Antes buscava TODA a tabela simulado_resultados (todas as rodadas, todos os anos) com um
+   join embutido em simulados, e só depois filtrava por ano_letivo no JS — ficando mais lento
+   a cada rodada nova e a cada ano que passa. Agora usa só as rodadas do ano selecionado
+   (simuladosList, já carregada) pra filtrar direto no banco com .in(), sem join nenhum. */
 async function loadSimHistory(){
   try {
+    const metaById = new Map(simuladosList.map(r => [r.id, r]));
+    const idsDoAno = [...metaById.keys()];
+    if (!idsDoAno.length) { SIM_HIST = { byAluno: new Map(), byNome: new Map() }; return; }
     const { data, error } = await supabase
       .from('simulado_resultados')
-      .select('aluno_id, nome_referencia, acertos, simulado:simulados(id, nome, data_aplicacao, ano_letivo)');
+      .select('aluno_id, nome_referencia, acertos, simulado_id')
+      .in('simulado_id', idsDoAno);
     if (error) throw error;
     const byAluno = new Map(), byNome = new Map();
     const add = (m, k, p) => { if (!m.has(k)) m.set(k, []); m.get(k).push(p); };
     (data || []).forEach(r => {
-      if (!r.simulado || r.simulado.ano_letivo !== selectedAnoLetivo) return;
-      const p = { simId: r.simulado.id, label: r.simulado.nome, data: r.simulado.data_aplicacao, acertos: r.acertos };
+      const meta = metaById.get(r.simulado_id);
+      if (!meta) return;
+      const p = { simId: meta.id, label: meta.nome, data: meta.data_aplicacao, acertos: r.acertos };
       if (r.aluno_id) add(byAluno, r.aluno_id, p);
       add(byNome, normName(r.nome_referencia), p);
     });
