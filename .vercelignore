@@ -10,3 +10,12 @@
 !fotos-aprovacoes
 !doc-requerimento-topo.png
 !doc-contrato-logo.jpeg
+!vercel.json
+# dentro de fotos-aprovacoes só vão as 20 fotos que o landing.html usa (o resto eram ~9 MB sem uso)
+fotos-aprovacoes/carrossel
+fotos-aprovacoes/icaro.jpg
+fotos-aprovacoes/jessica.png
+fotos-aprovacoes/matheus.png
+fotos-aprovacoes/michele.png
+fotos-aprovacoes/rhuan.png
+fotos-aprovacoes/_pendente-nome-10.jpg
