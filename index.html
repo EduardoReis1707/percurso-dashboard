@@ -2179,6 +2179,7 @@
               <input class="search" id="search" type="text" placeholder="Buscar aluno pelo nome...">
               <button class="sortbtn" id="sortBtn">Ordenar: Melhor → pior</button>
               <button class="sortbtn" id="relTodosBtn" type="button" title="Um relatório por aluno, para imprimir">📄 Relatórios de todos</button>
+              <button class="sortbtn" id="emailTodosBtn" type="button" title="Envia a cada responsável o relatório do próprio aluno">✉ Enviar aos responsáveis</button>
             </div>
             <table>
               <thead><tr><th>#</th><th>Aluno</th><th>Turma</th><th>Desempenho</th><th>Acertos</th><th>%</th><th></th></tr></thead>
@@ -2254,7 +2255,7 @@
         </div>
 
         <div class="tabpanel active" id="tab-resumo">
-          <div style="display:flex;justify-content:flex-end;margin-bottom:12px"><button class="sortbtn" id="btnRelSim" type="button">📄 Relatório do simulado</button></div>
+          <div style="display:flex;justify-content:flex-end;margin-bottom:12px"><button class="sortbtn" id="btnRelSim" type="button">📄 Relatório do simulado</button><button class="sortbtn" id="btnEmailSim" type="button" style="margin-left:8px" title="Envia o relatório em PDF para o e-mail do responsável">✉ Enviar ao responsável</button></div>
           <div class="stu-grid">
             <div class="panel">
               <div class="sec-head" style="margin-bottom:10px"><h2 style="font-size:15px">Acertos por tópico</h2></div>
@@ -2270,7 +2271,7 @@
 
         <div class="tabpanel" id="tab-evolucao">
           <div class="panel">
-            <div class="sec-head" style="margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2 style="font-size:15px">Evolução entre simulados</h2><button class="sortbtn" id="btnRelGeral" type="button">📄 Relatório geral</button></div>
+            <div class="sec-head" style="margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2 style="font-size:15px">Evolução entre simulados</h2><span style="display:flex;gap:8px"><button class="sortbtn" id="btnRelGeral" type="button">📄 Relatório geral</button><button class="sortbtn" id="btnEmailGeral" type="button" title="Envia o relatório geral em PDF para o e-mail do responsável">✉ Enviar ao responsável</button></span></div>
             <div class="evo-wrap" id="evoChart"></div>
           </div>
         </div>
@@ -6301,17 +6302,21 @@ function docCarregarScript(win, src) {
   });
 }
 /* PDF de verdade (download direto): cada folha A4 vira uma imagem em alta resolução dentro do PDF */
-async function docSalvarPdf(fr, nomeArquivo) {
+async function docConstruirPdf(fr, escala, qualidade) {
   const win = fr.contentWindow;
   if (!win.html2canvas) await docCarregarScript(win, "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
   if (!win.jspdf) await docCarregarScript(win, "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
   const folhas = [...win.document.querySelectorAll("section.req, section.ctr, section.rec, section.rel")];
   const pdf = new win.jspdf.jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   for (let i = 0; i < folhas.length; i++) {
-    const canvas = await win.html2canvas(folhas[i], { scale: 2, useCORS: true, backgroundColor: "#fff" });
+    const canvas = await win.html2canvas(folhas[i], { scale: escala, useCORS: true, backgroundColor: "#fff" });
     if (i) pdf.addPage();
-    pdf.addImage(canvas.toDataURL("image/jpeg", 0.95), "JPEG", 0, 0, 210, 297);
+    pdf.addImage(canvas.toDataURL("image/jpeg", qualidade), "JPEG", 0, 0, 210, 297);
   }
+  return pdf;
+}
+async function docSalvarPdf(fr, nomeArquivo) {
+  const pdf = await docConstruirPdf(fr, 2, 0.95);
   const url = URL.createObjectURL(pdf.output("blob"));
   const a = document.createElement("a");
   a.href = url; a.download = nomeArquivo + ".pdf";
@@ -6320,8 +6325,11 @@ async function docSalvarPdf(fr, nomeArquivo) {
 }
 /* Mostra o documento numa camada sobre o painel (sem janela nova, que muitos navegadores bloqueiam),
    com botões separados: Imprimir e Salvar PDF. */
+function docMontar(corpoHTML, titulo) {
+  return "<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><title>" + docEsc(titulo) + "</title><style>" + DOC_CSS + "</style></head><body>" + corpoHTML + "<scr" + "ipt>" + DOC_SCRIPT + "</scr" + "ipt></body></html>";
+}
 function abrirDocumento(corpoHTML, titulo, nomeArquivo) {
-  const doc = "<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><title>" + docEsc(titulo) + "</title><style>" + DOC_CSS + "</style></head><body>" + corpoHTML + "<scr" + "ipt>" + DOC_SCRIPT + "</scr" + "ipt></body></html>";
+  const doc = docMontar(corpoHTML, titulo);
   let ov = byId("docs-overlay");
   if (ov) ov.remove();
   ov = document.createElement("div");
@@ -7227,10 +7235,186 @@ function atualizarBotoesRelatorio(s) {
   const n = simHistoricoDe(s).filter(p => p.acertos != null).length;
   bGeral.textContent = `📄 Relatório geral (${n} simulado${n === 1 ? "" : "s"})`;
   bGeral.disabled = n < 1;
+  byId("btnEmailSim").disabled = bSim.disabled; byId("btnEmailGeral").disabled = bGeral.disabled;
 }
 byId("btnRelSim").addEventListener("click", () => relAlunoAtual && abrirRelatorioSimulado(relAlunoAtual));
 byId("btnRelGeral").addEventListener("click", () => relAlunoAtual && abrirRelatorioGeral(relAlunoAtual));
 byId("relTodosBtn").addEventListener("click", abrirRelatoriosDaRodada);
+
+/* ===================== envio dos relatórios por e-mail ===================== */
+/* O PDF é gerado aqui no navegador e enviado pela função `enviar-relatorio` do Supabase
+   (só aceita quem está logado no painel). O remetente é o Gmail configurado nos segredos
+   GMAIL_USER e GMAIL_APP_PASSWORD do projeto. */
+const REL_ENVIADOS_KEY = "percurso_rel_enviados_v1";
+function relEnviados() { try { return JSON.parse(localStorage.getItem(REL_ENVIADOS_KEY) || "{}"); } catch (e) { return {}; } }
+function marcarEnviado(chave) { try { const o = relEnviados(); o[chave] = hojeISO(); localStorage.setItem(REL_ENVIADOS_KEY, JSON.stringify(o)); } catch (e) { /* sem armazenamento local: só não marca */ } }
+function contatoDoResponsavel(s) {
+  const c = (s.aluno_id && alunoPorId(s.aluno_id)) || alunoPorNome(s.nome);
+  return { email: (c && c.emailResp) || "", resp: c && c.responsavel && c.responsavel !== "—" ? c.responsavel : "" };
+}
+function primeiroNome(n) { return String(n || "").trim().split(/\s+/)[0] || ""; }
+
+/* modelo da mensagem; {responsavel}, {aluno} e {simulado} são trocados no envio */
+function modeloMensagem(tipo) {
+  const o = tipo === "geral"
+    ? "o relatório geral de desempenho de {aluno} nos simulados deste ano, com a evolução entre eles"
+    : "o relatório de desempenho de {aluno} no {simulado}";
+  return `Olá, {responsavel}!\n\nSegue em anexo ${o}. Nele você encontra a nota, o desempenho em cada matéria e as orientações de estudo.\n\nQualquer dúvida, estamos à disposição.\n\nEquipe Percurso Cataguases`;
+}
+function aplicarModelo(txt, s, contato) {
+  return txt.split("{responsavel}").join(contato.resp || "responsável")
+    .split("{aluno}").join(primeiroNome(s.nome) ? s.nome : "seu(sua) filho(a)")
+    .split("{simulado}").join(currentSimuladoMeta ? currentSimuladoMeta.nome : "simulado");
+}
+function prepararRelatorio(tipo, s) {
+  if (tipo === "geral") {
+    const itens = dadosRelatorioGeral(s);
+    const n = itens.filter(i => i.feito).length;
+    return { html: relatorioGeralHTML(s, itens), assunto: `Relatório geral de desempenho — ${s.nome}`, arquivo: docNomeArquivo("Relatorio geral", s.nome), chave: `geral|${s.nome}|${n}`, ok: n > 0, folhas: 2 };
+  }
+  const nomeSim = currentSimuladoMeta ? currentSimuladoMeta.nome : "Simulado";
+  return { html: relatorioSimuladoHTML(s), assunto: `Relatório de desempenho — ${s.nome} — ${nomeSim}`, arquivo: docNomeArquivo("Relatorio " + simRodadaAtualCurta(), s.nome), chave: `${currentSimuladoMeta ? currentSimuladoMeta.id : ""}|${s.nome}`, ok: s.acertos !== null && s.acertos !== undefined, folhas: 1 };
+}
+
+/* PDF leve para e-mail (~300 KB por folha), montado numa janela escondida */
+async function pdfBase64DeHTML(corpoHTML, titulo) {
+  const fr = document.createElement("iframe");
+  fr.style.cssText = "position:fixed;left:-10000px;top:0;width:900px;height:1200px;border:0";
+  document.body.appendChild(fr);
+  try {
+    await new Promise(ok => { fr.onload = ok; fr.srcdoc = docMontar(corpoHTML, titulo); });
+    await new Promise(r => setTimeout(r, 250));
+    const pdf = await docConstruirPdf(fr, 1.4, 0.8);
+    return pdf.output("datauristring").split(",")[1];
+  } finally { fr.remove(); }
+}
+async function enviarRelatorioEmail({ para, assunto, mensagem, html, arquivo }) {
+  const pdf = await pdfBase64DeHTML(html, assunto);
+  const { data, error } = await supabase.functions.invoke("enviar-relatorio", { body: { para, assunto, mensagem, arquivo, pdf_base64: pdf } });
+  if (error) {
+    let j = {};
+    try { j = await error.context.json(); } catch (e) { /* sem corpo */ }
+    const err = new Error(j.erro || error.message || "falha");
+    err.codigo = j.erro || "falha"; err.detalhe = j.detalhe || "";
+    throw err;
+  }
+  return data;
+}
+function textoErroEnvio(e) {
+  switch (e.codigo) {
+    case "sem_configuracao": return "O envio por e-mail ainda não foi configurado no servidor (faltam o Gmail e a senha de app). Veja as instruções que o Claude passou.";
+    case "nao_autorizado": return "Sua sessão expirou. Entre no painel de novo e tente outra vez.";
+    case "email_invalido": return "O e-mail do responsável parece inválido.";
+    case "pdf_invalido_ou_grande": return "O PDF ficou grande demais para enviar.";
+    case "falha_no_envio": return "O Gmail recusou o envio" + (e.detalhe ? " (" + e.detalhe + ")" : "") + ". Confira a senha de app.";
+    default: return "Não consegui enviar: " + (e.message || e);
+  }
+}
+
+/* ---------- envio de um relatório ---------- */
+function abrirModalEmail(tipo, nome) {
+  const s = byName(nome);
+  if (!s) return;
+  const rel = prepararRelatorio(tipo, s);
+  if (!rel.ok) { alert(tipo === "geral" ? "Este aluno ainda não tem nota em nenhum simulado deste ano." : "Este aluno não fez este simulado."); return; }
+  const contato = contatoDoResponsavel(s);
+  const ov = abrirModal(`
+    <h3 style="margin:0 0 4px;font-size:17px">Enviar relatório ao responsável</h3>
+    <p style="margin:0 0 12px;font-size:13px;color:var(--text-muted)">${esc(s.nome)} · ${tipo === "geral" ? "relatório geral" : "relatório do simulado"} em PDF anexo${contato.resp ? " · responsável: " + esc(contato.resp) : ""}</p>
+    <div class="form-fields" style="grid-template-columns:1fr">
+      <div class="form-field"><label>Para (e-mail do responsável)</label><input type="text" id="em-para" value="${esc(contato.email)}" placeholder="responsavel@email.com"></div>
+      <div class="form-field"><label>Assunto</label><input type="text" id="em-assunto" value="${esc(rel.assunto)}"></div>
+      <div class="form-field"><label>Mensagem</label><textarea id="em-msg" rows="9" style="width:100%;resize:vertical;font-family:inherit;font-size:13.5px;line-height:1.5;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text)">${esc(aplicarModelo(modeloMensagem(tipo), s, contato))}</textarea></div>
+    </div>
+    <div id="em-erro" class="cpf-hint invalid" style="margin-top:10px"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px">
+      <button class="btn btn-ghost" id="em-cancelar" type="button">Cancelar</button>
+      <button class="btn btn-primary" id="em-enviar" type="button">Enviar e-mail</button>
+    </div>`, { largura: 600 });
+  const $ = id => ov.querySelector("#" + id);
+  $("em-cancelar").onclick = fecharModal;
+  $("em-enviar").onclick = async () => {
+    const para = $("em-para").value.trim();
+    if (!para) { $("em-erro").textContent = "Informe o e-mail do responsável."; return; }
+    if (valEmail(para)) { $("em-erro").textContent = valEmail(para); return; }
+    $("em-erro").textContent = "";
+    $("em-enviar").disabled = true; $("em-enviar").textContent = "Gerando PDF e enviando…";
+    try {
+      await enviarRelatorioEmail({ para, assunto: $("em-assunto").value.trim(), mensagem: $("em-msg").value, html: rel.html, arquivo: rel.arquivo });
+      marcarEnviado(rel.chave);
+      fecharModal();
+      modalMensagem("E-mail enviado ✓", `O relatório de <b>${esc(s.nome)}</b> foi enviado para <b>${esc(para)}</b>.`, `<button class="btn btn-primary" id="em-ok" type="button">Ok</button>`).querySelector("#em-ok").onclick = fecharModal;
+    } catch (e) {
+      console.error(e);
+      $("em-erro").textContent = textoErroEnvio(e);
+      $("em-enviar").disabled = false; $("em-enviar").textContent = "Enviar e-mail";
+    }
+  };
+}
+
+/* ---------- envio para todos os responsáveis da rodada ---------- */
+function abrirModalEmailTodos() {
+  const lista = STUDENTS.filter(x => x.acertos !== null && x.acertos !== undefined).sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+  if (!lista.length) { alert("Nenhum aluno com nota neste simulado."); return; }
+  const enviados = relEnviados();
+  const linhas = lista.map(s => {
+    const c = contatoDoResponsavel(s), valido = c.email && !valEmail(c.email);
+    const jaEnviado = enviados[`${currentSimuladoMeta ? currentSimuladoMeta.id : ""}|${s.nome}`];
+    return { s, c, valido, jaEnviado };
+  });
+  const semEmail = linhas.filter(l => !l.valido).length;
+  const ov = abrirModal(`
+    <h3 style="margin:0 0 4px;font-size:17px">Enviar relatórios aos responsáveis</h3>
+    <p style="margin:0 0 10px;font-size:13px;color:var(--text-muted)">${esc(currentSimuladoMeta ? currentSimuladoMeta.nome : "Simulado")} · cada responsável recebe o relatório do próprio aluno em PDF.${semEmail ? ` <b>${semEmail}</b> aluno(s) estão sem e-mail válido do responsável e não serão enviados.` : ""}</p>
+    <div style="max-height:260px;overflow:auto;border:1px solid var(--border);border-radius:8px;margin-bottom:10px">
+      <table style="width:100%;font-size:12.5px;border-collapse:collapse">
+        <thead><tr><th style="width:28px"><input type="checkbox" id="et-todos"></th><th style="text-align:left;padding:6px">Aluno</th><th style="text-align:left;padding:6px">Responsável / e-mail</th><th style="text-align:left;padding:6px;width:110px">Situação</th></tr></thead>
+        <tbody>${linhas.map((l, i) => `<tr style="border-top:1px solid var(--border)"><td style="padding:5px;text-align:center"><input type="checkbox" class="et-ck" data-i="${i}" ${l.valido && !l.jaEnviado ? "checked" : ""} ${l.valido ? "" : "disabled"}></td><td style="padding:5px 6px">${esc(l.s.nome)}</td><td style="padding:5px 6px">${esc(l.c.resp || "—")}<div style="font-size:11px;color:var(--text-muted)">${esc(l.c.email || "sem e-mail")}</div></td><td style="padding:5px 6px" id="et-st-${i}">${l.jaEnviado ? "enviado " + esc(fmtDate(l.jaEnviado).slice(0, 5)) : (l.valido ? "pendente" : "—")}</td></tr>`).join("")}</tbody>
+      </table>
+    </div>
+    <div class="form-field"><label>Mensagem <span style="font-weight:400;opacity:.7">({responsavel}, {aluno} e {simulado} são preenchidos para cada um)</span></label>
+      <textarea id="et-msg" rows="7" style="width:100%;resize:vertical;font-family:inherit;font-size:13px;line-height:1.5;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text)">${esc(modeloMensagem("simulado"))}</textarea></div>
+    <div id="et-prog" style="margin-top:10px;font-size:13px"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:12px">
+      <button class="btn btn-ghost" id="et-fechar" type="button">Fechar</button>
+      <button class="btn btn-primary" id="et-enviar" type="button">Enviar</button>
+    </div>`, { largura: 720 });
+  const $ = id => ov.querySelector("#" + id);
+  const marcados = () => [...ov.querySelectorAll(".et-ck")].filter(c => c.checked && !c.disabled).map(c => Number(c.dataset.i));
+  const rotulo = () => { $("et-enviar").textContent = `Enviar a ${marcados().length} responsável(is)`; $("et-enviar").disabled = !marcados().length; };
+  ov.querySelectorAll(".et-ck").forEach(c => c.addEventListener("change", rotulo));
+  $("et-todos").addEventListener("change", e => { ov.querySelectorAll(".et-ck:not(:disabled)").forEach(c => { c.checked = e.target.checked; }); rotulo(); });
+  rotulo();
+  let cancelar = false, enviando = false;
+  $("et-fechar").onclick = () => { if (enviando && !confirm("Há envios em andamento. Parar e fechar?")) return; cancelar = true; fecharModal(); };
+  $("et-enviar").onclick = async () => {
+    const ids = marcados();
+    if (!ids.length) return;
+    enviando = true; $("et-enviar").disabled = true;
+    ov.querySelectorAll(".et-ck, #et-todos").forEach(c => { c.disabled = true; });
+    let ok = 0, falhas = 0;
+    for (let k = 0; k < ids.length && !cancelar; k++) {
+      const l = linhas[ids[k]], st = $("et-st-" + ids[k]);
+      $("et-prog").textContent = `Enviando ${k + 1} de ${ids.length}: ${l.s.nome}…`;
+      st.textContent = "enviando…";
+      try {
+        const rel = prepararRelatorio("simulado", l.s);
+        await enviarRelatorioEmail({ para: l.c.email, assunto: rel.assunto, mensagem: aplicarModelo($("et-msg").value, l.s, l.c), html: rel.html, arquivo: rel.arquivo });
+        marcarEnviado(rel.chave); st.textContent = "enviado ✓"; st.style.color = "var(--success)"; ok++;
+      } catch (e) {
+        console.error(e); falhas++; st.textContent = "falhou"; st.style.color = "var(--critical)"; st.title = textoErroEnvio(e);
+        if (e.codigo === "sem_configuracao" || e.codigo === "nao_autorizado" || e.codigo === "falha_no_envio") { $("et-prog").innerHTML = `<span style="color:var(--critical)">${esc(textoErroEnvio(e))} Envio interrompido.</span>`; enviando = false; $("et-enviar").disabled = false; $("et-enviar").textContent = "Tentar de novo"; ov.querySelectorAll(".et-ck").forEach(c => { c.disabled = !linhas[c.dataset.i].valido; }); $("et-todos").disabled = false; return; }
+      }
+    }
+    enviando = false;
+    $("et-prog").innerHTML = `<b>Concluído:</b> ${ok} enviado(s)${falhas ? `, <span style="color:var(--critical)">${falhas} falha(s)</span>` : ""}.`;
+    $("et-enviar").style.display = "none";
+  };
+}
+
+byId("btnEmailSim").addEventListener("click", () => relAlunoAtual && abrirModalEmail("simulado", relAlunoAtual));
+byId("btnEmailGeral").addEventListener("click", () => relAlunoAtual && abrirModalEmail("geral", relAlunoAtual));
+byId("emailTodosBtn").addEventListener("click", abrirModalEmailTodos);
 
 /* ===================== importar fotos dos alunos ===================== */
 let pickedFotoFiles = [];
