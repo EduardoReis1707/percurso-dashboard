@@ -7392,19 +7392,33 @@ function abrirModalEmailTodos() {
     if (!ids.length) return;
     enviando = true; $("et-enviar").disabled = true;
     ov.querySelectorAll(".et-ck, #et-todos").forEach(c => { c.disabled = true; });
-    let ok = 0, falhas = 0;
-    for (let k = 0; k < ids.length && !cancelar; k++) {
-      const l = linhas[ids[k]], st = $("et-st-" + ids[k]);
-      $("et-prog").textContent = `Enviando ${k + 1} de ${ids.length}: ${l.s.nome}…`;
-      st.textContent = "enviando…";
-      try {
-        const rel = prepararRelatorio("simulado", l.s);
-        await enviarRelatorioEmail({ para: l.c.email, assunto: rel.assunto, mensagem: aplicarModelo($("et-msg").value, l.s, l.c), html: rel.html, arquivo: rel.arquivo });
-        marcarEnviado(rel.chave); st.textContent = "enviado ✓"; st.style.color = "var(--success)"; ok++;
-      } catch (e) {
-        console.error(e); falhas++; st.textContent = "falhou"; st.style.color = "var(--critical)"; st.title = textoErroEnvio(e);
-        if (e.codigo === "sem_configuracao" || e.codigo === "nao_autorizado" || e.codigo === "falha_no_envio") { $("et-prog").innerHTML = `<span style="color:var(--critical)">${esc(textoErroEnvio(e))} Envio interrompido.</span>`; enviando = false; $("et-enviar").disabled = false; $("et-enviar").textContent = "Tentar de novo"; ov.querySelectorAll(".et-ck").forEach(c => { c.disabled = !linhas[c.dataset.i].valido; }); $("et-todos").disabled = false; return; }
+    // envia vários ao mesmo tempo (4 por vez): cada um gera o próprio PDF e dispara o e-mail
+    let ok = 0, falhas = 0, proximo = 0, erroFatal = null;
+    const atualizarProg = () => { $("et-prog").textContent = `Enviados ${ok} de ${ids.length}${falhas ? " · " + falhas + " falha(s)" : ""}…`; };
+    const trabalhador = async () => {
+      while (!cancelar && !erroFatal) {
+        const k = proximo++;
+        if (k >= ids.length) return;
+        const l = linhas[ids[k]], st = $("et-st-" + ids[k]);
+        st.textContent = "enviando…";
+        try {
+          const rel = prepararRelatorio("simulado", l.s);
+          await enviarRelatorioEmail({ para: l.c.email, assunto: rel.assunto, mensagem: aplicarModelo($("et-msg").value, l.s, l.c), html: rel.html, arquivo: rel.arquivo });
+          marcarEnviado(rel.chave); st.textContent = "enviado ✓"; st.style.color = "var(--success)"; ok++;
+        } catch (e) {
+          console.error(e); falhas++; st.textContent = "falhou"; st.style.color = "var(--critical)"; st.title = textoErroEnvio(e);
+          if (e.codigo === "sem_configuracao" || e.codigo === "nao_autorizado" || e.codigo === "falha_no_envio") erroFatal = e;
+        }
+        atualizarProg();
       }
+    };
+    atualizarProg();
+    await Promise.all(Array.from({ length: Math.min(4, ids.length) }, trabalhador));
+    if (erroFatal) {
+      $("et-prog").innerHTML = `<span style="color:var(--critical)">${esc(textoErroEnvio(erroFatal))} Envio interrompido: ${ok} enviado(s), ${falhas} falha(s).</span>`;
+      enviando = false; $("et-enviar").disabled = false; $("et-enviar").textContent = "Tentar de novo";
+      ov.querySelectorAll(".et-ck").forEach(c => { c.disabled = !linhas[c.dataset.i].valido; }); $("et-todos").disabled = false;
+      return;
     }
     enviando = false;
     $("et-prog").innerHTML = `<b>Concluído:</b> ${ok} enviado(s)${falhas ? `, <span style="color:var(--critical)">${falhas} falha(s)</span>` : ""}.`;
