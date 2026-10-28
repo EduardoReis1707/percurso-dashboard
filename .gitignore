@@ -3,3 +3,14 @@
 .DS_Store
 
 .vercel
+
+# Dados de alunos/responsáveis e scripts de importação: ficam só no computador, nunca no GitHub
+db_alunos.json
+name_to_id.json
+fin_batch_*.sql
+finv2_batch_*.sql
+import_*.sql
+presenca_import/
+horas_import/
+fotos/
+faltosos-*.html

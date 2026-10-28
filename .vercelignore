@@ -2,6 +2,8 @@
 # presença/horas/fotos) têm dados de alunos e responsáveis e NÃO podem ir para a internet.
 /*
 !index.html
+!css
+!js
 !landing.html
 !responsavel.html
 !logo-percurso.png
