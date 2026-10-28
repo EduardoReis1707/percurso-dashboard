@@ -26,7 +26,7 @@ let allStudentsRaw = [];
 let anosDisponiveis = [];
 let selectedAnoLetivo = null;
 const ANO_LETIVO_KEY = 'percurso_ano_letivo';
-let presencas = [];
+let presencasTotal = 0;
 let presencaSummaryByAluno = new Map();
 let professoresList = [];
 let horarioSemanal = [];
@@ -483,21 +483,11 @@ async function loadStudents() {
 
 /* ===================== Presenças ===================== */
 async function loadPresencas() {
-  // paginado: sem isso o Supabase corta a resposta em 1.000 linhas e as frequências ficam erradas
-  presencas = await buscarTodasLinhas(() => supabase
-    .from("presencas")
-    .select("id, aluno_id, turma_id, data, presente")
-    .order("data").order("id"));
-
-  const map = new Map();
-  for (const p of presencas) {
-    if (!p.aluno_id) continue;
-    let entry = map.get(p.aluno_id);
-    if (!entry) { entry = { presencas: 0, faltas: 0, turmaId: p.turma_id, registros: [] }; map.set(p.aluno_id, entry); }
-    if (p.presente) entry.presencas++; else entry.faltas++;
-    entry.registros.push({ data: p.data, presente: p.presente });
-  }
-  presencaSummaryByAluno = map;
+  // o resumo (presenças/faltas por aluno) é somado no servidor; o histórico de um aluno só é buscado ao abri-lo
+  const { data, error } = await supabase.rpc("presencas_resumo");
+  if (error) throw error;
+  presencasTotal = data.total;
+  presencaSummaryByAluno = new Map(data.alunos.map(a => [a.aluno_id, { presencas: a.presencas, faltas: a.faltas }]));
 }
 
 function freqLevel(pct) {

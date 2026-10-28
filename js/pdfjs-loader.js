@@ -16,3 +16,18 @@ function ensurePdfJsLoaded() {
   });
   return _pdfJsLoadPromise;
 }
+
+/* jsPDF (relatório por matéria e ficha de horas) também só é baixado quando alguém gera um PDF */
+let _jsPdfLoadPromise = null;
+function ensureJsPdfLoaded() {
+  if (window.jspdf && window.jspdf.jsPDF) return Promise.resolve();
+  if (_jsPdfLoadPromise) return _jsPdfLoadPromise;
+  _jsPdfLoadPromise = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s.onload = () => resolve();
+    s.onerror = () => { _jsPdfLoadPromise = null; reject(new Error('Falha ao carregar a biblioteca de PDF.')); };
+    document.head.appendChild(s);
+  });
+  return _jsPdfLoadPromise;
+}

@@ -36,7 +36,7 @@ function renderPresencas() {
     .filter(r => r.total > 0);
 
   // ---- estatísticas gerais (sempre sobre a base completa, não filtrada) ----
-  const totalAulas = presencas.length;
+  const totalAulas = presencasTotal;
   const mediaGeral = rows.length ? Math.round((rows.reduce((a, r) => a + r.pct, 0) / rows.length) * 10) / 10 : null;
   const criticos = rows.filter(r => r.level === "critica").length;
   byId("pres-stat-media").textContent = mediaGeral !== null ? mediaGeral.toString().replace(".", ",") + "%" : "—";
@@ -82,10 +82,13 @@ byId("presenca-body").addEventListener("click", (e) => {
   if (btn) openPresencaDetail(btn.dataset.presDetail);
 });
 
-function openPresencaDetail(alunoId) {
+async function openPresencaDetail(alunoId) {
   const s = students.find(x => x.id === alunoId);
   const sum = presencaSummaryByAluno.get(alunoId);
   if (!s || !sum) return;
+  const { data: registros, error } = await supabase.from("presencas").select("data, presente").eq("aluno_id", alunoId).order("data");
+  if (error) { console.error("Erro ao carregar o histórico de presenças:", error); alert("Não foi possível carregar o histórico deste aluno. Tente de novo."); return; }
+  sum.registros = registros;
 
   const total = sum.presencas + sum.faltas;
   const pct = total ? Math.round((sum.presencas / total) * 1000) / 10 : 0;
@@ -600,9 +603,10 @@ async function excluirLancamento(registroId) {
 byId("ficha-mes-select").addEventListener("change", renderFichaResumo);
 byId("ficha-detalhe-mes-select").addEventListener("change", renderFichaDetalhe);
 
-byId("ficha-pdf-btn").addEventListener("click", () => {
+byId("ficha-pdf-btn").addEventListener("click", async () => {
   const prof = professoresList.find(p => p.id === fichaProfessorAtual);
   if (!prof) return;
+  try { await ensureJsPdfLoaded(); } catch (e) { alert(e.message); return; }
   const mes = fichaDetalheMes();
   const rows = registrosAula.filter(r => r.professor_id === fichaProfessorAtual && r.mes_referencia === mes).sort((a, b) => a.data.localeCompare(b.data));
   gerarPdfFicha(prof, mes, rows);
@@ -1577,8 +1581,27 @@ const VIEW_RENDERERS = {
   material: () => renderMaterial(),
   fotos: () => { renderFotosTabela(); atualizarCaixaMiniaturas(); },
   presencas: () => renderPresencas(),
-  horarios: () => renderHorarios(),
+  horarios: () => { if (horariosProntos) { esconderCarregandoHorarios(); renderHorarios(); } else { mostrarCarregandoHorarios(); garantirHorarios(); } },
 };
+/* horários, registros de aula e execução só são baixados na primeira vez que a aba Horários é aberta */
+let horariosProntos = false, horariosPromise = null;
+function mostrarCarregandoHorarios() {
+  const v = byId("view-horarios");
+  if (v && !byId("hor-carregando")) v.insertAdjacentHTML("afterbegin", '<p id="hor-carregando" style="padding:24px;color:var(--text-faint)">Carregando horários…</p>');
+}
+function esconderCarregandoHorarios() { const el = byId("hor-carregando"); if (el) el.remove(); }
+function garantirHorarios() {
+  if (!horariosPromise) {
+    horariosPromise = Promise.all([loadHorarioSemanal(), loadRegistrosAula(), loadHorarioExecucao()])
+      .then(() => { horariosProntos = true; dirtyViews.add("horarios"); desenharViewSeSuja(); })
+      .catch(err => {
+        horariosPromise = null;
+        console.error("Erro ao carregar horários:", err);
+        const el = byId("hor-carregando"); if (el) el.textContent = "Erro ao carregar os horários. Abra a aba de novo para tentar outra vez.";
+      });
+  }
+  return horariosPromise;
+}
 const dirtyViews = new Set();
 function nomeDaViewAtiva() {
   const v = document.querySelector(".view.active");

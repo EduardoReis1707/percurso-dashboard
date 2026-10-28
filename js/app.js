@@ -88,14 +88,14 @@ async function bootstrapData() {
     populateTurmaFilters();
     byId("f-data-matricula").value = new Date().toISOString().slice(0, 10);
     renderAll();
-    // presenças (~15 mil linhas) e horários só são usados nas suas abas: carregam depois da primeira tela
-    Promise.all([loadPresencas(), loadHorarioSemanal(), loadRegistrosAula(), loadHorarioExecucao()])
-      .then(() => { dirtyViews.add("presencas"); dirtyViews.add("horarios"); desenharViewSeSuja(); statusEl.textContent = "Dados sincronizados agora"; })
-      .catch(err => { console.error("Erro ao carregar presenças/horários:", err); statusEl.textContent = "Erro ao carregar presenças/horários — recarregue a página"; });
+    // o resumo de presenças é calculado no servidor e carrega depois da primeira tela; os horários só carregam ao abrir a aba Horários
+    loadPresencas()
+      .then(() => { dirtyViews.add("presencas"); desenharViewSeSuja(); statusEl.textContent = "Dados sincronizados agora"; })
+      .catch(err => { console.error("Erro ao carregar presenças:", err); statusEl.textContent = "Erro ao carregar presenças — recarregue a página"; });
     loadPagamentos().catch(err => console.error("Erro ao carregar pagamentos:", err));
     initSimulados().catch(err => console.error("Erro ao carregar simulados:", err));
     initBolsao().catch(err => console.error("Erro ao carregar o Bolsão:", err));
-    statusEl.textContent = "Carregando presenças e horários…";
+    statusEl.textContent = "Carregando presenças…";
   } catch (err) {
     console.error(err);
     statusEl.textContent = "Erro ao carregar dados — recarregue a página";
