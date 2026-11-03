@@ -9,15 +9,15 @@ const DOC_MATRICULA_CFG = {
   cnpj: "30.026.277/0001-54",
   enderecoEmpresa: "Rua Tenente Fortunato, 200 – Sala 101/ Centro Cataguases MG",
   cidade: "Cataguases",
-  inicioCurso: "09/02/2026",
-  terminoCurso: "30/10/2026",
+  inicioCurso: "15/02/2027",
+  terminoCurso: "25/11/2027",
   aulasSemana: "16 (DEZESSEIS)",
   aulasAno: "450 (QUATROCENTOS E CINQUENTA)",
   horarioAulas: "de segunda a quinta-feira das 14h às 17h30min",
-  taxaMatricula: "R$ 60,00 (Sessenta reais)",
-  materialTotal: "R$ 380,00 (Trezentos e oitenta reais)",
-  materialParcelas: "4(quatro) parcelas de R$ 95,00",
-  materialAVista: "R$ 342,00 (Trezentos e quarenta e dois reais)",
+  taxaMatricula: "R$ 80,00 (Oitenta reais)",
+  materialTotal: "R$ 480,00 (Quatrocentos e oitenta reais)",
+  materialParcelas: "4(quatro) parcelas de R$ 120,00",
+  materialAVista: "R$ 440,00 (Quatrocentos e quarenta reais)",
   alunosMinimos: "20 alunos",
 };
 
@@ -173,7 +173,7 @@ function docContratoHTML(d) {
       <div class="cr">Data de Vencimento:${docU(venc)}</div>
     </div>
     <p>${B("Suspensão do desconto concedido:")} O desconto eventualmente concedido será automaticamente suspenso se o CONTRATANTE não efetuar o pagamento de qualquer das parcelas nas suas respectivas datas de vencimento, caso em que as parcelas serão automaticamente ajustadas ao Valor Integral, acrescido de encargos legais e contratuais.<br>
-    ${B("Parágrafo segundo")} – O pagamento das parcelas deverá ser efetuado mediante a apresentação do carnê, nas importâncias e vencimentos do plano de pagamento constante no parágrafo primeiro da cláusula terceira.<br>
+    ${B("Parágrafo segundo")} – O pagamento das parcelas deverá ser efetuado mediante a apresentação de comprovante, nas importâncias e vencimentos do plano de pagamento constante no parágrafo primeiro da cláusula terceira.<br>
     ${B("Parágrafo terceiro -")} O ${CT} e seu responsável legal/financeiro assumem, solidariamente, a responsabilidade pelo pagamento de todo o valor da obrigação, fracionada de acordo com os meses do período letivo. As únicas hipóteses em que o ${CT} estará dispensado de realizar o pagamento do valor total do contrato, são o trancamento/cancelamento de matrícula tempestivamente solicitados pelo ${CT} à ${CD}.<br>
     ${B("Parágrafo quarto")} - O não comparecimento do ${CT} aos atos acadêmicos contratados, bem como o não acesso aos conteúdos disponibilizados pela ${CD} ao ${CT}, não o eximirão do pagamento das parcelas, tendo em vista a disponibilidade do serviço colocado à disposição pela ${CD}.</p>
     <p>${B("CLÁUSULA QUARTA – Do Valor e Forma de Pagamento do material didático:")}<br>
@@ -193,7 +193,7 @@ function docContratoHTML(d) {
     a) Cumprir o disposto nas cláusulas do presente Contrato, bem como na legislação em vigor;<br>
     b) Manter rigorosamente em dia o pagamento das mensalidades, sob pena de rescisão deste contrato quando vencidas e não pagas 02 (duas) parcelas, mesmo alternadas e/ou protesto do título com encaminhamento de carta negativa para registro nos órgãos ou entidades de Serviço de Proteção ao Crédito pela ${CD}.</p>
     <p>${B("CLÁUSULA OITAVA– Da divulgação da imagem do aluno:")}<br>O CONTRATADO, livre de quaisquer ônus para com o CONTRATANTE / ALUNO, poderá utilizar seu nome e sua imagem para fins exclusivos de divulgação do CONTRATADO e de suas atividades, podendo, para tanto, reproduzi-la ou divulgá-la junto à internet e quaisquer outros meios de comunicação, públicos e privados, dentro do período de 05 anos, comprometendo-se a não utilizá-la de maneira contrária à moral ou aos bons costumes.</p>
-    <p>${B("CLÁUSULA NONA – Do Foro de Eleição:")}<br>As partes elegem o Foro da cidade de Cataguases-Mg, para dirimir eventuais dúvidas e controvérsias oriundas do presente Contrato, renunciando a qualquer outro por mais privilegiado que seja. E por estarem de acordo, assinam o presente instrumento em duas vias de igual teor .</p>
+    <p>${B("CLÁUSULA NONA – Do Foro de Eleição:")}<br>As partes elegem o Foro da cidade de Cataguases-Mg, para dirimir eventuais dúvidas e controvérsias oriundas do presente Contrato, renunciando a qualquer outro por mais privilegiado que seja. E por estarem de acordo, assinam o presente instrumento em duas vias de igual teor.</p>
     <p class="ctr-data">${docEsc(C.cidade)}, ${docEsc(docDataExtenso(d.dataMat))}</p>
     <div class="ctr-sign"><div class="line"></div><b>CONTRATADA</b></div>
     <div class="ctr-sign"><div class="line"></div><b>CONTRATANTE</b></div>
