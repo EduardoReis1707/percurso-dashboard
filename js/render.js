@@ -1467,6 +1467,7 @@ function openEditForm(id) {
   byId("f-fin-valor-parcela").value = moneyStr(s.mensalidade);
   byId("f-fin-vencimento").value = s.vencimento && s.vencimento !== "—" ? s.vencimento : "";
   byId("f-fin-apostila-valor").value = "";
+  byId("f-fin-apostila-forma").value = "";
   byId("f-fin-apostila-parcelas").value = "";
   byId("f-fin-apostila-data").value = "";
   carregarMaterialNoForm(id, moneyStr);

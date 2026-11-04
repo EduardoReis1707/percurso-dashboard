@@ -246,7 +246,7 @@ async function executeSaveMatricula(){
       const qtd = parseInt(qtdRaw, 10);
       const notas = [];
       if (valorMatricula) notas.push(`Matrícula: ${valorMatricula} via ${formaMat}${dataPag ? " em " + fmtDate(dataPag) : ""}`);
-      if (apostilaValor) notas.push(`Material didático: ${apostilaValor} via ${apostilaForma}${apostilaParcelas > 1 ? " em " + apostilaParcelas + "x" : ""}`);
+      if (apostilaValor) notas.push(`Material didático: ${apostilaValor}${apostilaForma ? " via " + apostilaForma + (apostilaParcelas > 1 ? " em " + apostilaParcelas + "x" : "") : ""}`);
       // todos os campos financeiros do formulário vão para colunas próprias (antes só parcela e vencimento eram gravados)
       const finPayload = {
         valor_matricula: parseMoneyBR(valorMatricula),
@@ -280,7 +280,7 @@ async function executeSaveMatricula(){
         aluno_id: alunoId,
         tipo: "apostila",
         valor: parseMoneyBR(apostilaValor),
-        forma_pagamento: apostilaForma + (apostilaParcelas > 1 ? " em " + apostilaParcelas + "x" : ""),
+        forma_pagamento: apostilaForma ? apostilaForma + (apostilaParcelas > 1 ? " em " + apostilaParcelas + "x" : "") : null,
         data_pagamento: apostilaData || null,
       };
       const { data: matExist, error: matBuscaErr } = await supabase.from("material_didatico").select("id").eq("aluno_id", alunoId).eq("tipo", "apostila").maybeSingle();
