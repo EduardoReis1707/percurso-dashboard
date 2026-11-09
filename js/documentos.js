@@ -20,6 +20,23 @@ const DOC_MATRICULA_CFG = {
   materialAVista: "R$ 440,00 (Quatrocentos e quarenta reais)",
   alunosMinimos: "20 alunos",
 };
+/* Mesma ideia do DOC_MATRICULA_CFG, mas para a turma do 8º ano: curso mais curto, sem
+   cobrança de material didático e sem a cláusula correspondente no contrato. */
+const DOC_MATRICULA_CFG_8ANO = {
+  inicioCurso: "16/02/2027",
+  terminoCurso: "18/11/2027",
+  aulasSemana: "6 (seis)",
+  aulasAno: "200 (Duzentas)",
+  horarioAulas: "nas Terças-feiras e Quintas-feiras das 14h às 16h50min",
+  taxaMatricula: "R$ 80,00 (Oitenta reais)",
+  alunosMinimos: "10 alunos",
+};
+
+/* "8" para turma do 8º ano, "9" para as demais (CEFET/ENEM) — decide qual template de
+   contrato usar. Compara por normName (sem acento/maiúscula) pra não depender de "º" exato. */
+function docSerieDaTurma(turma) {
+  return turma && normName(turma.tipo || turma.nome || "").startsWith("8") ? "8" : "9";
+}
 
 function docV(id) { const el = byId(id); return el ? el.value.trim() : ""; }
 function docEsc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
@@ -127,7 +144,13 @@ function docRequerimentoHTML(d) {
   </section>`;
 }
 
+/* Contrato do(a) aluno(a): dispatcher entre o template do 9º ano (Pré-CEFET, com a cláusula
+   de material didático) e o do 8º ano (sem material didático, cláusulas renumeradas). */
 function docContratoHTML(d) {
+  return d.serie === "8" ? docContrato8AnoHTML(d) : docContrato9AnoHTML(d);
+}
+
+function docContrato9AnoHTML(d) {
   const { aluno: a, resp: r, fin: f } = d, C = DOC_MATRICULA_CFG;
   const ano = d.ano || (d.turma ? d.turma.ano_letivo : selectedAnoLetivo);
   // contratante = responsável; se o aluno não tem responsável cadastrado, ele mesmo contrata
@@ -195,6 +218,78 @@ function docContratoHTML(d) {
     <p>${B("CLÁUSULA OITAVA– Da divulgação da imagem do aluno:")}<br>O CONTRATADO, livre de quaisquer ônus para com o CONTRATANTE / ALUNO, poderá utilizar seu nome e sua imagem para fins exclusivos de divulgação do CONTRATADO e de suas atividades, podendo, para tanto, reproduzi-la ou divulgá-la junto à internet e quaisquer outros meios de comunicação, públicos e privados, dentro do período de 05 anos, comprometendo-se a não utilizá-la de maneira contrária à moral ou aos bons costumes.</p>
     <p>${B("CLÁUSULA NONA – Do Foro de Eleição:")}<br>As partes elegem o Foro da cidade de Cataguases-Mg, para dirimir eventuais dúvidas e controvérsias oriundas do presente Contrato, renunciando a qualquer outro por mais privilegiado que seja. E por estarem de acordo, assinam o presente instrumento em duas vias de igual teor.</p>
     <p class="ctr-data">${docEsc(C.cidade)}, ${docEsc(docDataExtenso(d.dataMat))}</p>
+    <div class="ctr-sign"><div class="line"></div><b>CONTRATADA</b></div>
+    <div class="ctr-sign"><div class="line"></div><b>CONTRATANTE</b></div>
+    </div></div>
+  </section>`;
+}
+
+/* Contrato da turma do 8º ano: mesma estrutura visual do contrato do 9º ano (Pré-CEFET), mas
+   sem a cláusula de material didático (não há cobrança de apostila nessa turma), com as
+   cláusulas seguintes renumeradas e os dados do curso (datas, carga horária, horário) próprios. */
+function docContrato8AnoHTML(d) {
+  const { aluno: a, resp: r, fin: f } = d, C = DOC_MATRICULA_CFG_8ANO;
+  const ano = d.ano || (d.turma ? d.turma.ano_letivo : selectedAnoLetivo);
+  const c = r.nome ? r : { nome: a.nome, nacionalidade: "", cpf: a.cpf, rg: a.rg, rgOrgao: a.rgOrgao, rgData: a.rgData, profissao: "", nasc: a.nasc };
+  const venc = f.venc ? "dia " + f.venc.replace(/\D/g, "") + " de cada mês" : "";
+  const B = s => `<b>${s}</b>`;
+  const CT = "<b>CONTRATANTE</b>", CD = "<b>CONTRATADA</b>";
+  const dd = iso => { const p = iso ? iso.split("-") : ["", "", ""]; return `${p[2] || "____"} / ${p[1] || "____"} / ${p[0] || "_____"}`; };
+  return `<section class="ctr"><div class="ctr-view"><div class="ctr-txt">
+    <div class="ctr-logo"><img src="${docAsset("doc-contrato-logo.jpeg")}" alt=""></div>
+    <p class="ctr-title"><b>CONTRATO DE PRESTAÇÃO DE SERVIÇOS EDUCACIONAIS<br>CURSO PREPARATÓRIO PARA O CEFET/MG - 8º ANO - ${ano}</b></p>
+    <div class="cr"><b>ALUNO(A):</b> ${docU(a.nome)}</div>
+    <div class="ctr-box">
+      <div class="ctr-partes">
+        <p>Pelo presente instrumento particular de Contrato de Prestação de Serviços de Preparação para o CEFET/MG, as Partes devidamente identificadas também na Ficha de Matrícula, da qual o presente Contrato é parte integrante na forma de Anexo I, resolvem celebrar o presente Contrato, conforme cláusulas e condições a seguir expostas.</p>
+        <p><b>CONTRATADO: ${docEsc(DOC_MATRICULA_CFG.empresa)}</b>, inscrito no C.N.P.J sob o número <b>${docEsc(DOC_MATRICULA_CFG.cnpj)}, estabelecido na ${docEsc(DOC_MATRICULA_CFG.enderecoEmpresa)}, por seu representante legal;</b></p>
+      </div>
+      <div class="ctr-contratante">
+        <div class="cr"><b>CONTRATANTE:</b>${docU(c.nome)}</div>
+        <div class="cr"><b>Nacionalidade:</b>${docU(c.nacionalidade)}</div>
+        <div class="cr"><b>CPF.</b>${docU(c.cpf)}</div>
+        <div class="cr"><b>RG.</b>${docU(c.rg)}<b>Órgão Expedidor</b>${docU(c.rgOrgao, "flex:.7")}</div>
+        <div class="cr"><b>Data Expedição ${dd(c.rgData)} Profissão</b>${docU(c.profissao)}</div>
+        <div class="cr"><b>Data Nascimento ${dd(c.nasc)}</b></div>
+        <div class="cr"><b>Endereço Residencial:</b>${docU(a.endereco)}</div>
+        <div class="cr"><b>CEP:</b>${docU(a.cep, "flex:.8")}<b>Bairro:</b>${docU(a.bairro)}</div>
+        <div class="cr"><b>Cidade:</b>${docU(a.cidade)}<b>Estado:</b>${docU(a.uf)}</div>
+      </div>
+    </div>
+    <p>${B("CLÁUSULA PRIMEIRA – Do Objeto:")}<br>Constitui objeto do presente Contrato a Prestação de Serviços de ${B("CURSO PREPATATÓRIO PARA O CEFET")}, pela ${CD}, com aulas ministradas de forma presencial.<br>
+    ${B("Parágrafo primeiro –")} A prestação desses serviços terá início em ${B(docEsc(C.inicioCurso) + " e")} previsão de término em ${B(docEsc(C.terminoCurso) + ".")} (As Aulas acontecerão duas vezes na semana nas Terças e Quintas-feiras). ${B("(Podendo haver modificação devido as datas das provas de acordo com seus editais em " + ano + ").")}<br>
+    ${B("Parágrafo segundo")} - Está obrigada a ${CD} em fornecer aulas de Matemática, Língua Portuguesa, História, Geografia, Física, Química e Biologia no período mencionado no parágrafo primeiro.<br>
+    ${B("Parágrafo terceiro")} - Está obrigada a ${CD} a prestar o serviço com uma carga horária mínima semanal de ${docEsc(C.aulasSemana)} aulas com duração de 50 minutos e no mínimo em período anual de ${docEsc(C.aulasAno)} aulas em ${ano}. O horário das aulas serão ${docEsc(C.horarioAulas)}.</p>
+    <p>${B("CLÁUSULA SEGUNDA – Da Matrícula")}:<br>
+    ${B("Parágrafo primeiro")} - A efetivação da matrícula se dará mediante a assinatura, pelo ${CT}, da ${B("Ficha de Matrícula")}, da adesão ao Contrato de Prestação de Serviço e do pagamento da matrícula.<br>
+    ${B("Parágrafo segundo -")} Será cobrado do ${CT}, a título de matrícula, o valor equivalente a ${docEsc(C.taxaMatricula)}. Em caso de desistência, em hipótese alguma será devolvida a taxa de matrícula ao ${CT} por conta das despesas administrativas.</p>
+    <p>${B("CLÁUSULA TERCEIRA – Do Valor e Forma de Pagamento da prestação de serviço:")}<br>
+    ${B("Parágrafo primeiro")} – Como contraprestação pelos serviços educacionais contratados, o CONTRATANTE deverá pagar ao CONTRATADO o valor descrito na Ficha de Matrícula, nos prazos também ali descritos.</p>
+    <div class="ctr-valores">
+      <div class="cr">Valor Total do Curso: R$${docU(docNum(f.total))}</div>
+      <div class="cr">Nº de Parcelas${docU(f.parcelas)}</div>
+      <div class="cr">Valor da Parcela: R$${docU(docNum(f.parcela))}</div>
+      <div class="cr">Data de Vencimento:${docU(venc)}</div>
+    </div>
+    <p>${B("Suspensão do desconto concedido:")} O desconto eventualmente concedido será automaticamente suspenso se o CONTRATANTE não efetuar o pagamento de qualquer das parcelas nas suas respectivas datas de vencimento, caso em que as parcelas serão automaticamente ajustadas ao Valor Integral, acrescido de encargos legais e contratuais.<br>
+    ${B("Parágrafo segundo")} – O pagamento das parcelas deverá ser efetuado mediante a apresentação do comprovante, nas importâncias e vencimentos do plano de pagamento constante no parágrafo primeiro da cláusula terceira.<br>
+    ${B("Parágrafo terceiro -")} O ${CT} e seu responsável legal/financeiro assumem, solidariamente, a responsabilidade pelo pagamento de todo o valor da obrigação, fracionada de acordo com os meses do período letivo. As únicas hipóteses em que o ${CT} estará dispensado de realizar o pagamento do valor total do contrato, são o trancamento/cancelamento de matrícula tempestivamente solicitados pelo ${CT} à ${CD}.<br>
+    ${B("Parágrafo quarto")} - O não comparecimento do ${CT} aos atos acadêmicos contratados, bem como o não acesso aos conteúdos disponibilizados pela ${CD} ao ${CT}, não o eximirão do pagamento das parcelas, tendo em vista a disponibilidade do serviço colocado à disposição pela ${CD}.</p>
+    <p>${B("CLÁUSULA QUARTA – Da rescisão")}<br>
+    ${B("Parágrafo primeiro")} - O cancelamento de matrícula são os únicos atos eficazes para suspender a cobrança das parcelas vincendas daquela data em diante, remanescendo a obrigação do ${CT} quanto ao pagamento das parcelas vencidas e ainda não pagas.<br>
+    ${B("Parágrafo segundo")} - Para efetivar o cancelamento de matrícula, o ${CT} deverá estar em dia com as mensalidades devidas até a data da respectiva solicitação ou, alternativamente, firmar um Instrumento de Confissão de Dívida, reconhecendo o seu débito para com a ${CD} e acordando a forma de pagamento deste débito.<br>
+    ${B("Parágrafo terceiro -")} O ${CT} que requerer o cancelamento de matrícula não terá, em nenhuma hipótese e sob nenhum fundamento, direito à devolução dos valores pagos até a data da apresentação do cancelamento, visto que tais pagamentos remuneraram a serviços já prestados e custos já incorridos pela ${B("CONTRATADA.")}<br>
+    ${B("Parágrafo quarto")} - Em caso de rescisão movida pelo ${CT} fica este sujeito à aplicação de multa rescisória acordada entre as partes correspondente ao valor de 1 (uma) parcela. sem prejuízo da parcela referente ao mês em que o pedido formal do cancelamento foi requerido.<br>
+    ${B("Parágrafo quinto")} - A ${CD} poderá rescindir o presente Contrato quando no início das aulas não houverem a quantidade mínima de alunos para custear o curso que que são de ${docEsc(C.alunosMinimos)}. Nesta hipótese, obriga-se a ${CD} a restituir à ${CT}, mediante prévio requerimento desta, a parcela possivelmente antecipada pelo ${CT}. A restituição prevista nesta cláusula se efetivará após um prazo de 5 (cinco) dias úteis após a comunicação que não haverá o curso por não atingir o número mínimo de alunos.<br>
+    ${B("Parágrafo sexto -")} Ainda, será facultado à ${CD} rescindir o presente Contrato pela prática de atos de indisciplina por parte do ${CT}, sendo devidamente quitadas as mensalidades até a data do efetivo desligamento do ${CT}, não tendo como obrigação o contratante pagar a multa de rescisão de contrato.<br>
+    ${B("Parágrafo sétimo -")} Poderá a ${CD} dar por rescindido o presente Contrato na hipótese de inadimplência do ${CT} após 30 dias de inadimplência.</p>
+    <p>${B("CLÁUSULA QUINTA – Das obrigações da Contratada:")}<br>São obrigações da ${CD}:<br>Atender o cronograma de atividades, transmitindo, diariamente, as aulas em local apropriado, devendo anunciar ao(a) ${CT}, com antecedência, possíveis alterações de horário, aulas complementares e/ou de reposição, que poderão ser ministradas em outros dias e outros horários.</p>
+    <p>${B("CLÁUSULA SEXTA – das obrigações do(a) contratante:")}<br>${B("São Obrigações do(a) CONTRATANTE:")}<br>
+    a) Cumprir o disposto nas cláusulas do presente Contrato, bem como na legislação em vigor;<br>
+    b) Manter rigorosamente em dia o pagamento das parcelas, sob pena de rescisão deste contrato quando vencidas e não pagas 02 (duas) parcelas, mesmo alternadas e/ou protesto do título com encaminhamento de carta negativa para registro nos órgãos ou entidades de Serviço de Proteção ao Crédito pela ${CD}.</p>
+    <p>${B("CLÁUSULA SÉTIMA – Da divulgação da imagem do aluno:")}<br>O CONTRATADO, livre de quaisquer ônus para com o CONTRATANTE / ALUNO, poderá utilizar seu nome e sua imagem para fins exclusivos de divulgação do CONTRATADO e de suas atividades, podendo, para tanto, reproduzi-la ou divulgá-la junto à internet e quaisquer outros meios de comunicação, públicos e privados, dentro do período de 05 anos, comprometendo-se a não utilizá-la de maneira contrária à moral ou aos bons costumes.</p>
+    <p>${B("CLÁUSULA OITAVA – Do Foro de Eleição:")}<br>As partes elegem o Foro da cidade de Cataguases-Mg, para dirimir eventuais dúvidas e controvérsias oriundas do presente Contrato, renunciando a qualquer outro por mais privilegiado que seja. E por estarem de acordo, assinam o presente instrumento em duas vias de igual teor.</p>
+    <p class="ctr-data">${docEsc(DOC_MATRICULA_CFG.cidade)}, ${docEsc(docDataExtenso(d.dataMat))}</p>
     <div class="ctr-sign"><div class="line"></div><b>CONTRATADA</b></div>
     <div class="ctr-sign"><div class="line"></div><b>CONTRATANTE</b></div>
     </div></div>
@@ -384,6 +479,7 @@ async function gerarContratoDoFormulario() {
     const r = d.resp.nome ? d.resp : { nome: d.aluno.nome, nacionalidade: "", cpf: d.aluno.cpf, rg: d.aluno.rg, rgOrgao: d.aluno.rgOrgao, rgData: d.aluno.rgData, profissao: "", nasc: d.aluno.nasc };
     const c = {
       ano: d.turma ? d.turma.ano_letivo : selectedAnoLetivo, turma: d.turma, dataMat: d.dataMat,
+      serie: docSerieDaTurma(d.turma),
       aluno: { nome: d.aluno.nome, endereco: d.aluno.endereco, bairro: d.aluno.bairro, cidade: d.aluno.cidade, cep: d.aluno.cep, uf: d.aluno.uf },
       resp: { nome: r.nome, nacionalidade: r.nacionalidade, cpf: r.cpf, rg: r.rg, rgOrgao: r.rgOrgao, rgData: r.rgData, profissao: r.profissao, nasc: r.nasc },
       fin: { total: d.fin.total, parcelas: d.fin.parcelas, parcela: d.fin.parcela, venc: d.fin.venc },
@@ -411,13 +507,13 @@ function contratoPopularLista() {
 }
 function contratoLimpar() {
   ["busca", "nome", "nacionalidade", "cpf", "rg", "rg-orgao", "rg-data", "profissao", "nasc", "endereco", "cep", "bairro", "uf", "aluno-nome", "total", "parcelas", "parcela", "venc"].forEach(id => cSet(id, ""));
-  cSet("cidade", "Cataguases"); cSet("data", new Date().toISOString().slice(0, 10));
+  cSet("cidade", "Cataguases"); cSet("data", new Date().toISOString().slice(0, 10)); cSet("serie", "9");
   byId("c-cpf-hint").textContent = ""; byId("c-cpf").classList.remove("cpf-valid", "cpf-invalid");
 }
 function contratoPreencher(x) {
   cSet("nome", x.nome); cSet("nacionalidade", x.nacionalidade); cSet("cpf", x.cpf ? maskCPF(x.cpf) : ""); cSet("rg", x.rg); cSet("rg-orgao", x.rgOrgao); cSet("rg-data", x.rgData);
   cSet("profissao", x.profissao); cSet("nasc", x.nasc); cSet("endereco", x.endereco); cSet("cep", x.cep); cSet("bairro", x.bairro);
-  cSet("cidade", x.cidade || "Cataguases"); cSet("uf", x.uf); cSet("aluno-nome", x.alunoNome);
+  cSet("cidade", x.cidade || "Cataguases"); cSet("uf", x.uf); cSet("aluno-nome", x.alunoNome); cSet("serie", x.serie || "9");
   cSet("total", formatMoneyBR(x.total)); cSet("parcelas", x.parcelas || ""); cSet("parcela", formatMoneyBR(x.parcela)); cSet("venc", x.venc);
   byId("c-cpf").dispatchEvent(new Event("input"));
 }
@@ -427,11 +523,13 @@ function contratoCarregarAluno() {
   if (!s) { alert("Aluno não encontrado. Escolha um nome da lista."); return; }
   const temResp = s.responsavel && s.responsavel !== "—";
   const end = [s.endereco, s.numero, s.complemento].filter(Boolean).join(", ");
+  const turma = s.turmaId ? turmasList.find(t => t.id === s.turmaId) : null;
   contratoPreencher({
     nome: temResp ? s.responsavel : s.nome, cpf: temResp ? s.respCpf : s.cpf, rg: temResp ? s.respRg : s.rg, rgOrgao: temResp ? s.respRgOrgao : s.rgOrgao,
     rgData: temResp ? s.respRgData : s.rgData, profissao: temResp ? s.profissaoResp : "", nasc: temResp ? s.respNascimento : s.nascimento,
     nacionalidade: "", endereco: end, cep: s.cep || "", bairro: s.bairro, cidade: s.cidade, uf: s.uf || "",
     alunoNome: s.nome, total: s.finTotalCurso, parcelas: s.finQtdParcelas, parcela: s.mensalidade, venc: s.vencimento && s.vencimento !== "—" ? s.vencimento : "",
+    serie: docSerieDaTurma(turma),
   });
 }
 function contratoDoRequerimento() {
@@ -442,6 +540,7 @@ function contratoDoRequerimento() {
     nome: r.nome, nacionalidade: r.nacionalidade, cpf: r.cpf, rg: r.rg, rgOrgao: r.rgOrgao, rgData: r.rgData, profissao: r.profissao, nasc: r.nasc,
     endereco: d.aluno.endereco, cep: d.aluno.cep, bairro: d.aluno.bairro, cidade: d.aluno.cidade, uf: d.aluno.uf, alunoNome: d.aluno.nome,
     total: parseMoneyBR(d.fin.total), parcelas: d.fin.parcelas, parcela: parseMoneyBR(d.fin.parcela), venc: d.fin.venc,
+    serie: docSerieDaTurma(d.turma),
   });
 }
 function problemasContrato() {
@@ -467,7 +566,7 @@ async function gerarContrato() {
     if (!cV("aluno-nome").trim()) { alert("Preencha o nome do aluno."); byId("c-aluno-nome").focus(); return; }
     if (!(await confirmarProblemas(problemasContrato(), "gerar o contrato"))) return;
     const d = {
-      ano: selectedAnoLetivo, turma: null, dataMat: cV("data"),
+      ano: selectedAnoLetivo, turma: null, dataMat: cV("data"), serie: cV("serie") || "9",
       aluno: { nome: cV("aluno-nome"), endereco: cV("endereco"), bairro: cV("bairro"), cidade: cV("cidade"), cep: cV("cep"), uf: cV("uf").toUpperCase() },
       resp: { nome: cV("nome"), nacionalidade: cV("nacionalidade"), cpf: cV("cpf"), rg: cV("rg"), rgOrgao: cV("rg-orgao"), rgData: cV("rg-data"), profissao: cV("profissao"), nasc: cV("nasc") },
       fin: { total: cV("total"), parcelas: cV("parcelas"), parcela: cV("parcela"), venc: cV("venc") },
