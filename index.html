@@ -64,7 +64,7 @@
         <button type="button" class="link-btn" id="role-back" style="align-self:flex-start;">← Trocar perfil</button>
         <p class="login-sub" id="login-role-label">Entre com sua conta para acessar os dados reais de matrícula, financeiro e alunos.</p>
         <div class="form-field"><label>E-mail</label><input type="email" id="login-email" required autocomplete="username"></div>
-        <div class="form-field"><label>Senha</label><input type="password" id="login-password" required autocomplete="current-password"></div>
+        <div class="form-field"><label>Senha</label><div class="pw-wrap"><input type="password" id="login-password" required autocomplete="current-password"><button type="button" class="pw-toggle" id="login-password-toggle" aria-label="Mostrar senha" title="Mostrar senha"></button></div></div>
         <div class="login-error" id="login-error"></div>
         <button type="submit" class="btn btn-primary" id="login-btn" style="justify-content:center; width:100%;">Entrar</button>
         <button type="button" class="link-btn" id="forgot-link">Esqueci minha senha</button>
@@ -81,8 +81,8 @@
       <form class="login-step" id="forgot-code-form" hidden>
         <p class="login-sub">Digite o código de 6 dígitos enviado para <strong id="forgot-email-display"></strong> e escolha a nova senha.</p>
         <div class="form-field"><label>Código recebido por e-mail</label><input type="text" id="forgot-code" required autocomplete="one-time-code"></div>
-        <div class="form-field"><label>Nova senha</label><input type="password" id="forgot-new-pw" required minlength="8" autocomplete="new-password"></div>
-        <div class="form-field"><label>Confirmar nova senha</label><input type="password" id="forgot-confirm-pw" required minlength="8" autocomplete="new-password"></div>
+        <div class="form-field"><label>Nova senha</label><div class="pw-wrap"><input type="password" id="forgot-new-pw" required minlength="8" autocomplete="new-password"><button type="button" class="pw-toggle" id="forgot-new-pw-toggle" aria-label="Mostrar senha" title="Mostrar senha"></button></div></div>
+        <div class="form-field"><label>Confirmar nova senha</label><div class="pw-wrap"><input type="password" id="forgot-confirm-pw" required minlength="8" autocomplete="new-password"><button type="button" class="pw-toggle" id="forgot-confirm-pw-toggle" aria-label="Mostrar senha" title="Mostrar senha"></button></div></div>
         <div class="login-error" id="forgot-code-error"></div>
         <button type="submit" class="btn btn-primary" id="forgot-code-btn" style="justify-content:center; width:100%;">Confirmar e trocar senha</button>
         <button type="button" class="link-btn" id="forgot-code-back">Voltar para o login</button>

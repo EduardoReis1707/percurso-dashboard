@@ -923,6 +923,16 @@
   }
   .form-field input:focus, .form-field select:focus { outline: 2px solid var(--accent-soft-line); border-color: var(--accent); }
 
+  .pw-wrap { position: relative; }
+  .pw-wrap input { width: 100%; box-sizing: border-box; padding-right: 36px; }
+  .pw-toggle {
+    position: absolute; right: 3px; top: 0; bottom: 0; margin: auto;
+    height: 28px; width: 28px; display: flex; align-items: center; justify-content: center;
+    background: none; border: 0; border-radius: 6px; cursor: pointer; color: var(--text-muted); padding: 0;
+  }
+  .pw-toggle:hover { color: var(--text); background: var(--accent-soft); }
+  .pw-toggle svg { width: 18px; height: 18px; }
+
   .empty-note {
     padding: 40px; text-align: center; color: var(--text-faint); font-size: 13px;
   }

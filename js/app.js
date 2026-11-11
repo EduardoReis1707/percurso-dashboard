@@ -102,6 +102,24 @@ async function bootstrapData() {
   }
 }
 
+/* olho de mostrar/ocultar senha: mesmo par de ícones para os 3 campos de senha do login */
+const PW_ICON_SHOW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
+const PW_ICON_HIDE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 7 11 7a18.4 18.4 0 0 1-3.17 4.2M6.6 6.6C3.4 8.6 1 12 1 12s4 7 11 7a10.6 10.6 0 0 0 5.4-1.6M1 1l22 22"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/></svg>';
+function wirePasswordToggle(inputId, btnId) {
+  const input = byId(inputId), btn = byId(btnId);
+  if (!input || !btn) return;
+  btn.innerHTML = PW_ICON_SHOW;
+  btn.addEventListener("click", () => {
+    const showing = input.type === "text";
+    input.type = showing ? "password" : "text";
+    btn.innerHTML = showing ? PW_ICON_SHOW : PW_ICON_HIDE;
+    btn.title = btn.ariaLabel = showing ? "Mostrar senha" : "Ocultar senha";
+  });
+}
+wirePasswordToggle("login-password", "login-password-toggle");
+wirePasswordToggle("forgot-new-pw", "forgot-new-pw-toggle");
+wirePasswordToggle("forgot-confirm-pw", "forgot-confirm-pw-toggle");
+
 byId("login-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const email = byId("login-email").value.trim();
